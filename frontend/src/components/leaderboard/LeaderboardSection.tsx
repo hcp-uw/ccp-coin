@@ -12,7 +12,7 @@ import { SectionWrapper } from "@/components/shared/SectionWrapper";
  */
 export function LeaderboardSection() {
   return (
-    <SectionWrapper id="leaderboard">
+    <SectionWrapper id="leaderboard" className="purple-section-glow">
       <FadeIn className="flex flex-wrap items-center justify-between gap-4">
         <div>
           <p className="eyebrow">Leaderboard preview</p>

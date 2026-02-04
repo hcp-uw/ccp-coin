@@ -16,7 +16,7 @@ export function FeaturesSection() {
   const editorialFeatures = content.features.items.slice(0, 3);
 
   return (
-    <SectionWrapper id="features">
+    <SectionWrapper id="features" className="purple-section-glow">
       <FadeIn className="space-y-4">
         <p className="eyebrow">Features</p>
         <h2 className="font-display text-4xl text-text lg:text-5xl">

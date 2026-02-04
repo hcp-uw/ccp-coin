@@ -6,7 +6,7 @@ import { SectionWrapper } from "@/components/shared/SectionWrapper";
 
 export function FAQSection() {
   return (
-    <SectionWrapper id="faq">
+    <SectionWrapper id="faq" className="purple-section-glow">
       <FadeIn>
         <p className="eyebrow">Support</p>
         <h2 className="mt-2 font-display text-4xl text-text lg:text-5xl">FAQ</h2>

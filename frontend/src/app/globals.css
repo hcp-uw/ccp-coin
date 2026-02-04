@@ -142,6 +142,21 @@ details[open] .faq-chevron {
   transform: rotate(180deg);
 }
 
+.purple-section-glow {
+  position: relative;
+}
+
+.purple-section-glow::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(600px 300px at 20% 20%, rgba(91, 63, 214, 0.18), transparent 60%),
+    radial-gradient(500px 260px at 80% 40%, rgba(91, 63, 214, 0.10), transparent 62%);
+  pointer-events: none;
+  z-index: -1;
+}
+
 .sr-only {
   position: absolute;
   width: 1px;

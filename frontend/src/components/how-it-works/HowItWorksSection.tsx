@@ -14,7 +14,7 @@ export function HowItWorksSection() {
   const { steps } = content.howItWorks;
 
   return (
-    <SectionWrapper id="how">
+    <SectionWrapper id="how" className="purple-section-glow">
       <FadeIn className="space-y-4">
         <p className="eyebrow">Process</p>
         <h2 className="font-display text-4xl text-text lg:text-5xl">

@@ -8,7 +8,7 @@ import { SectionWrapper } from "@/components/shared/SectionWrapper";
  */
 export function AINoteSection() {
   return (
-    <SectionWrapper>
+    <SectionWrapper className="purple-section-glow">
       <FadeIn className="border-l-2 border-gold/50 pl-6">
         <p className="eyebrow">{content.transparency.title}</p>
         <p className="mt-3 text-sm text-text">{content.transparency.body}</p>
