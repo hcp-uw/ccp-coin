@@ -2,56 +2,160 @@
 
 import { useCallback, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { FiCpu, FiChevronDown } from "react-icons/fi";
 import type { AIInsight, Ticker } from "@/content/mockData";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 
-const focusableToggle = (value: "Up" | "Down") => value.toLowerCase();
+// --- Sub-components ---
 
-const sparklinePath = (points: number[]) => {
-  if (points.length === 0) return { line: "", area: "" };
+const Sparkline = ({ points, symbol }: { points: number[]; symbol: string }) => {
+  if (points.length === 0) return null;
+  
   const max = Math.max(...points);
   const min = Math.min(...points);
   const range = max - min || 1;
 
+  // Generate path data
   const coords = points.map((point, index) => ({
     x: (index / (points.length - 1)) * 100,
-    y: 32 - ((point - min) / range) * 32,
+    y: 24 - ((point - min) / range) * 24, // Keep within 24px height
   }));
 
-  const line = coords
+  const linePath = coords
     .map((c, i) => `${i === 0 ? "M" : "L"}${c.x},${c.y}`)
     .join(" ");
 
-  // Area path: line path + close to bottom-right → bottom-left
-  const area = `${line} L100,32 L0,32 Z`;
-
-  return { line, area };
-};
-
-const Sparkline = ({ points, symbol }: { points: number[]; symbol: string }) => {
-  const { line, area } = sparklinePath(points);
-  const gradientId = `sparkFill-${symbol}`;
+  const areaPath = `${linePath} L100,32 L0,32 Z`;
+  const gradientId = `spark-gradient-${symbol}`;
 
   return (
-    <svg viewBox="0 0 100 32" className="h-8 w-24">
-      <defs>
-        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="rgba(198,161,91,0.3)" />
-          <stop offset="100%" stopColor="rgba(198,161,91,0)" />
-        </linearGradient>
-      </defs>
-      <path d={area} fill={`url(#${gradientId})`} />
-      <path
-        d={line}
-        fill="none"
-        stroke="rgba(198,161,91,0.8)"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
+    <div className="h-8 w-24">
+      <svg viewBox="0 0 100 32" className="h-full w-full overflow-visible">
+        <defs>
+          <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="rgb(var(--color-gold))" stopOpacity="0.3" />
+            <stop offset="100%" stopColor="rgb(var(--color-gold))" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        <path d={areaPath} fill={`url(#${gradientId})`} />
+        <path
+          d={linePath}
+          fill="none"
+          stroke="rgb(var(--color-gold))"
+          strokeWidth="1.5"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+    </div>
   );
 };
+
+type SegmentedToggleProps = {
+  value: "Up" | "Down" | null;
+  onChange: (val: "Up" | "Down") => void;
+};
+
+const SegmentedToggle = ({ value, onChange }: SegmentedToggleProps) => {
+  return (
+    <div className="flex rounded-lg bg-surface-2/50 p-1">
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onChange("Up"); }}
+        className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+          value === "Up"
+            ? "bg-up/10 text-up shadow-sm ring-1 ring-up/20"
+            : "text-muted hover:text-text"
+        }`}
+      >
+        Up
+      </button>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onChange("Down"); }}
+        className={`rounded-md px-3 py-1 text-xs font-medium transition-all ${
+          value === "Down"
+            ? "bg-down/10 text-down shadow-sm ring-1 ring-down/20"
+            : "text-muted hover:text-text"
+        }`}
+      >
+        Down
+      </button>
+    </div>
+  );
+};
+
+const StakeChip = () => (
+  <button
+    type="button"
+    onClick={(e) => e.stopPropagation()}
+    className="flex items-center gap-2 rounded-lg border border-border/40 bg-surface/40 px-3 py-1.5 text-xs text-muted transition hover:border-gold/30 hover:text-text"
+  >
+    <span>Stake: <span className="font-semibold text-text tabular-nums">50</span></span>
+    <FiChevronDown className="opacity-50" />
+  </button>
+);
+
+const AIPopover = ({ 
+  insight, 
+  onClose 
+}: { 
+  insight: AIInsight; 
+  onClose: () => void; 
+}) => {
+  const shouldReduceMotion = useReducedMotion();
+  
+  return (
+    <motion.div
+      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.98 }}
+      className="absolute right-0 top-full z-20 mt-2 w-80 rounded-2xl border border-purple/20 bg-obsidian/95 p-5 shadow-2xl backdrop-blur-xl"
+    >
+      <div className="absolute inset-0 -z-10 rounded-2xl bg-purple/5" />
+      
+      <div className="mb-4 flex items-center justify-between">
+        <div className="flex items-center gap-2 text-xs uppercase tracking-widest text-purple">
+          <FiCpu />
+          <span>AI Insight</span>
+        </div>
+        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="text-xs text-muted hover:text-text">
+          Close
+        </button>
+      </div>
+
+      <div className="space-y-4">
+        <div>
+          <div className="flex items-baseline justify-between">
+            <span className="text-sm font-medium text-text">Signal Strength</span>
+            <span className="font-mono text-xs text-gold">{insight.confidence}%</span>
+          </div>
+          <div className="mt-2 h-1 w-full overflow-hidden rounded-full bg-surface-2">
+            <div 
+              className={`h-full ${insight.suggestion === "Up" ? "bg-up" : "bg-down"}`} 
+              style={{ width: `${insight.confidence}%` }} 
+            />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-muted">Analysis</p>
+          <ul className="mt-2 space-y-2">
+            {insight.rationale.slice(0, 2).map((point, i) => (
+              <li key={i} className="flex gap-2 text-xs text-text/80">
+                <span className="mt-1 block h-1 w-1 shrink-0 rounded-full bg-border" />
+                {point}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </motion.div>
+  );
+};
+
+// --- Main Component ---
 
 type PredictionsConsoleProps = {
   tickers: Ticker[];
@@ -59,186 +163,149 @@ type PredictionsConsoleProps = {
 };
 
 export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsoleProps) {
-  const shouldReduceMotion = useReducedMotion();
+  const [activeRow, setActiveRow] = useState<string | null>(null);
   const [activeAI, setActiveAI] = useState<string | null>(null);
-  const [toggles, setToggles] = useState<Record<string, "Up" | "Down">>(() =>
-    Object.fromEntries(tickers.map((ticker) => [ticker.symbol, "Up"]))
-  );
-
+  const [predictions, setPredictions] = useState<Record<string, "Up" | "Down" | null>>({});
+  
   const consoleRef = useRef<HTMLDivElement>(null);
-  const closeAI = useCallback(() => setActiveAI(null), []);
 
-  useEscapeKey(closeAI, activeAI !== null);
-  useOutsideClick(consoleRef, closeAI, activeAI !== null);
+  const closeInteraction = useCallback(() => {
+    setActiveRow(null);
+    setActiveAI(null);
+  }, []);
+
+  useOutsideClick(consoleRef, closeInteraction, activeRow !== null);
+  useEscapeKey(closeInteraction, activeRow !== null);
+
+  const handleRowClick = (symbol: string) => {
+    setActiveRow(symbol);
+  };
 
   const handleToggle = (symbol: string, value: "Up" | "Down") => {
-    setToggles((prev) => ({ ...prev, [symbol]: value }));
+    setPredictions(prev => ({ ...prev, [symbol]: value }));
   };
 
-  const handleAI = (symbol: string) => {
-    setActiveAI((prev) => (prev === symbol ? null : symbol));
+  const handleAI = (e: React.MouseEvent, symbol: string) => {
+    e.stopPropagation();
+    setActiveAI(prev => prev === symbol ? null : symbol);
+    setActiveRow(symbol); // Ensure row is active when AI is open
   };
-
-  const activeInsight = useMemo(() => {
-    if (!activeAI) return null;
-    return aiInsights[activeAI];
-  }, [activeAI, aiInsights]);
 
   return (
-    <div ref={consoleRef} className="surface-card relative w-full max-w-xl overflow-visible rounded-[28px] border border-border bg-surface/80 p-6 shadow-glow">
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.28em] text-muted">Today&apos;s Predictions</p>
-          <h3 className="font-display text-xl text-text">Market Close Call</h3>
-        </div>
-        <div className="rounded-full border border-border bg-surface-2 px-3 py-1 text-xs text-muted">
-          DubCoins: 500
-        </div>
-      </div>
+    <div className="relative isolate" ref={consoleRef}>
+      {/* Background Aura */}
+      <div className="absolute -inset-8 -z-10 rounded-[3rem] bg-purple/5 blur-3xl transition-opacity duration-500" />
 
-      <div className="space-y-4 overflow-visible">
-        {tickers.map((ticker) => {
-          const isActive = activeAI === ticker.symbol;
-          const insight = aiInsights[ticker.symbol];
+      {/* Console Container */}
+      <div className="surface-card overflow-visible rounded-[24px] border border-border/60 bg-surface/90 backdrop-blur-md">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between border-b border-white/5 px-6 py-5">
+          <div>
+            <p className="text-[10px] uppercase tracking-[0.2em] text-gold/80">Market Close Call</p>
+            <h3 className="mt-1 font-display text-lg text-text">Today&apos;s Predictions</h3>
+          </div>
+          <div className="flex items-center gap-2 rounded-full border border-white/5 bg-white/5 px-3 py-1 text-xs font-medium text-muted">
+            <div className="h-1.5 w-1.5 rounded-full bg-gold animate-pulse" />
+            Live Market
+          </div>
+        </div>
 
-          return (
-            <div key={ticker.symbol} className="relative">
-              <div
-                className={`flex flex-wrap items-center gap-4 rounded-2xl border border-border bg-surface-2/70 p-4 transition ${
-                  isActive ? "border-gold/60 shadow-[0_0_0_1px_rgba(198,161,91,0.3)]" : ""
+        {/* Stock List */}
+        <div className="divide-y divide-white/5">
+          {tickers.map((ticker) => {
+            const isActive = activeRow === ticker.symbol;
+            const isAIOpen = activeAI === ticker.symbol;
+            const prediction = predictions[ticker.symbol] ?? null;
+
+            return (
+              <div 
+                key={ticker.symbol} 
+                className={`relative transition-colors duration-200 ${
+                  isActive ? "bg-purple/5" : "hover:bg-white/[0.02]"
                 }`}
+                onClick={() => handleRowClick(ticker.symbol)}
               >
-                <div className="min-w-[120px]">
-                  <p className="font-display text-lg text-text">{ticker.symbol}</p>
-                  <p className="text-xs text-muted">{ticker.name}</p>
-                </div>
-                <div>
-                  <p className="text-sm text-text">{ticker.price}</p>
-                  <p className={`text-xs ${ticker.change.startsWith("-") ? "text-down" : "text-up"}`}>
-                    {ticker.change}
-                  </p>
-                </div>
-                <Sparkline points={ticker.sparkline} symbol={ticker.symbol} />
-                <div className="flex items-center gap-2 rounded-full border border-border bg-obsidian/60 p-1 text-xs">
-                  {["Up", "Down"].map((value) => (
+                {/* Active Indicator Line */}
+                {isActive && (
+                  <motion.div 
+                    layoutId="activeRow"
+                    className="absolute left-0 top-0 bottom-0 w-0.5 bg-gold" 
+                  />
+                )}
+
+                <div className="grid grid-cols-[1.2fr_1.5fr_1fr_auto] items-center gap-4 px-6 py-4 md:grid-cols-[1.2fr_1.5fr_0.8fr_auto_auto_auto]">
+                  
+                  {/* 1. Ticker Info */}
+                  <div>
+                    <span className="block font-display text-base font-semibold text-text">{ticker.symbol}</span>
+                    <span className="block text-xs text-muted truncate max-w-[100px]">{ticker.name}</span>
+                  </div>
+
+                  {/* 2. Sparkline */}
+                  <div className="hidden sm:block">
+                    <Sparkline points={ticker.sparkline} symbol={ticker.symbol} />
+                  </div>
+
+                  {/* 3. Price / Change */}
+                  <div className="text-right sm:text-left">
+                    <span className="block text-sm font-medium text-text tabular-nums">{ticker.price}</span>
+                    <span className={`block text-xs tabular-nums font-medium ${
+                      ticker.change.startsWith("-") ? "text-down" : "text-up"
+                    }`}>
+                      {ticker.change}
+                    </span>
+                  </div>
+
+                  {/* 4. Stake Chip (Desktop) */}
+                  <div className="hidden md:block">
+                    <StakeChip />
+                  </div>
+
+                  {/* 5. Toggle */}
+                  <div className="ml-auto md:ml-0">
+                    <SegmentedToggle value={prediction} onChange={(val) => handleToggle(ticker.symbol, val)} />
+                  </div>
+
+                  {/* 6. AI Button */}
+                  <div className="relative hidden md:block">
                     <button
-                      key={value}
-                      type="button"
-                      onClick={() => handleToggle(ticker.symbol, value as "Up" | "Down")}
-                      className={`rounded-full px-3 py-1 transition ${
-                        toggles[ticker.symbol] === value
-                          ? value === "Up"
-                            ? "bg-up/20 text-up"
-                            : "bg-down/20 text-down"
-                          : "text-muted"
+                      onClick={(e) => handleAI(e, ticker.symbol)}
+                      className={`flex h-8 w-8 items-center justify-center rounded-lg border transition-all ${
+                        isAIOpen 
+                          ? "border-purple bg-purple/10 text-purple" 
+                          : "border-transparent text-muted hover:bg-white/5 hover:text-text"
                       }`}
-                      aria-pressed={toggles[ticker.symbol] === value}
-                      aria-label={`${ticker.symbol} ${focusableToggle(value as "Up" | "Down")}`}
+                      aria-label="Toggle AI Insight"
                     >
-                      {value}
+                      <FiCpu size={14} />
                     </button>
-                  ))}
+
+                    <AnimatePresence>
+                      {isAIOpen && (
+                        <AIPopover 
+                          insight={aiInsights[ticker.symbol]} 
+                          onClose={() => setActiveAI(null)} 
+                        />
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </div>
-                <button
-                  type="button"
-                  className="rounded-full border border-border bg-surface/60 px-4 py-2 text-xs text-muted opacity-70"
-                  disabled
-                >
-                  Wager DubCoins
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleAI(ticker.symbol)}
-                  aria-label={`Open AI Insight for ${ticker.symbol}`}
-                  aria-expanded={isActive}
-                  className="ml-auto flex h-9 w-9 items-center justify-center rounded-full border border-border bg-surface/70 text-[10px] uppercase tracking-[0.2em] text-muted transition hover:text-text"
-                >
-                  AI
-                </button>
+                
+                {/* Mobile AI/Stake Expansion (if needed, kept simple for now) */}
               </div>
+            );
+          })}
+        </div>
 
-              <AnimatePresence>
-                {isActive && insight ? (
-                  <motion.div
-                    key={`ai-${ticker.symbol}`}
-                    initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-                    transition={{ duration: shouldReduceMotion ? 0 : 0.25 }}
-                    className="relative mt-4 overflow-hidden rounded-2xl border border-border bg-obsidian/80 p-4 shadow-glow lg:absolute lg:left-[calc(100%+24px)] lg:top-0 lg:mt-0 lg:w-[320px]"
-                    data-testid="ai-panel"
-                  >
-                    <div className="absolute inset-y-0 left-0 w-1 bg-gradient-to-b from-gold via-purple to-transparent" />
-                    <div className="absolute -right-10 -top-10 h-24 w-24 rounded-full bg-gold/15 blur-2xl" />
-                    <div className="relative space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <p className="text-xs uppercase tracking-[0.24em] text-muted">AI Insight</p>
-                          <p className="font-display text-lg text-text">{ticker.symbol}</p>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => setActiveAI(null)}
-                          className="text-xs text-muted hover:text-text"
-                          aria-label="Close AI Insight"
-                        >
-                          Close
-                        </button>
-                      </div>
-
-                      <div className="rounded-xl border border-border bg-surface/70 p-3">
-                        <p className="text-sm text-text">
-                          Suggestion: <span className={insight.suggestion === "Up" ? "text-up" : "text-down"}>{insight.suggestion}</span>
-                        </p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <div className="h-1.5 flex-1 rounded-full bg-surface-2">
-                            <div
-                              className={`h-1.5 rounded-full ${
-                                insight.suggestion === "Up" ? "bg-up" : "bg-down"
-                              }`}
-                              style={{ width: `${insight.confidence}%` }}
-                            />
-                          </div>
-                          <span className="text-xs text-muted">{insight.confidence}%</span>
-                        </div>
-                      </div>
-
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.24em] text-muted">Why</p>
-                        <ul className="mt-2 list-disc space-y-1 pl-4 text-sm text-muted">
-                          {insight.rationale.map((item) => (
-                            <li key={item}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-
-                      <div className="section-divider" />
-
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.24em] text-muted">Sources to explore</p>
-                        <p className="mt-1 text-[11px] text-muted">Example sources</p>
-                        <ul className="mt-2 space-y-1 text-sm text-text">
-                          {insight.sources.map((source) => (
-                            <li key={source} className="rounded-lg border border-border bg-surface/60 px-2 py-1">
-                              {source}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-                  </motion.div>
-                ) : null}
-              </AnimatePresence>
-            </div>
-          );
-        })}
+        {/* Footer */}
+        <div className="border-t border-white/5 px-6 py-4">
+          <div className="flex items-center justify-between text-xs text-muted">
+            <span>Next allocation in 14:02:10</span>
+            <span className="tabular-nums">Balance: 500 DC</span>
+          </div>
+        </div>
       </div>
-
-      {activeInsight ? (
-        <p className="mt-6 text-xs text-muted">
-          AI insight is optional and contextual. Use it as a starting point, not a verdict.
-        </p>
-      ) : null}
     </div>
   );
 }

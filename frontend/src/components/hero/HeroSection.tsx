@@ -13,7 +13,7 @@ type HeroSectionProps = {
 
 export function HeroSection({ onSignUp, onWalkthrough }: HeroSectionProps) {
   return (
-    <section className="purple-aura grid gap-12 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
+    <section className="purple-aura purple-section-glow grid gap-12 py-20 lg:grid-cols-[1.1fr_0.9fr] lg:py-28">
       <FadeIn className="space-y-6">
         <p className="eyebrow">{content.hero.eyebrow}</p>
         <h1 className="font-display text-5xl leading-tight text-text sm:text-6xl lg:text-7xl">
