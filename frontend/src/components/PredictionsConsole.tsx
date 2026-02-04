@@ -234,21 +234,21 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
                   />
                 )}
 
-                <div className="grid grid-cols-[1.2fr_1.5fr_1fr_auto] items-center gap-4 px-6 py-4 md:grid-cols-[1.2fr_1.5fr_0.8fr_auto_auto_auto]">
+                <div className="grid grid-cols-[1fr_auto_auto] items-center gap-3 px-4 py-4 sm:gap-4 sm:px-6 md:grid-cols-[1.2fr_1.5fr_0.8fr_auto_auto_auto]">
                   
                   {/* 1. Ticker Info */}
-                  <div>
+                  <div className="min-w-0">
                     <span className="block font-display text-base font-semibold text-text">{ticker.symbol}</span>
-                    <span className="block text-xs text-muted truncate max-w-[100px]">{ticker.name}</span>
+                    <span className="block truncate text-xs text-muted sm:max-w-[100px]">{ticker.name}</span>
                   </div>
 
                   {/* 2. Sparkline */}
-                  <div className="hidden sm:block">
+                  <div className="hidden md:block">
                     <Sparkline points={ticker.sparkline} symbol={ticker.symbol} />
                   </div>
 
-                  {/* 3. Price / Change */}
-                  <div className="text-right sm:text-left">
+                  {/* 3. Price / Change - Right aligned on mobile */}
+                  <div className="text-right md:text-left">
                     <span className="block text-sm font-medium text-text tabular-nums">{ticker.price}</span>
                     <span className={`block text-xs tabular-nums font-medium ${
                       ticker.change.startsWith("-") ? "text-down" : "text-up"
@@ -263,7 +263,7 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
                   </div>
 
                   {/* 5. Toggle */}
-                  <div className="ml-auto md:ml-0">
+                  <div className="col-span-3 flex justify-end pt-2 sm:col-span-1 sm:pt-0 md:ml-0">
                     <SegmentedToggle value={prediction} onChange={(val) => handleToggle(ticker.symbol, val)} />
                   </div>
 

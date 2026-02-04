@@ -26,33 +26,35 @@ export function LeaderboardSection() {
         </div>
       </FadeIn>
 
-      <div className="mt-8" data-testid="leaderboard">
-        {/* Table header */}
-        <div className="grid grid-cols-[80px_1fr_120px_120px] gap-4 border-b border-gold/10 pb-3 text-xs uppercase tracking-[0.2em] text-muted">
-          <span>Rank</span>
-          <span>Student</span>
-          <span>Streak</span>
-          <span>DubCoins</span>
-        </div>
+      <div className="mt-8 overflow-x-auto" data-testid="leaderboard">
+        <div className="min-w-[500px]">
+          {/* Table header */}
+          <div className="grid grid-cols-[80px_1fr_120px_120px] gap-4 border-b border-gold/10 pb-3 text-xs uppercase tracking-[0.2em] text-muted">
+            <span>Rank</span>
+            <span>Student</span>
+            <span>Streak</span>
+            <span>DubCoins</span>
+          </div>
 
-        {/* Table rows */}
-        <div className="divide-y divide-border">
-          {leaderboard.map((row) => (
-            <div
-              key={row.rank}
-              className={`grid grid-cols-[80px_1fr_120px_120px] items-center gap-4 py-4 text-sm ${
-                row.rank === 1 ? "border-l-2 border-l-gold/60 bg-gold/10 pl-4" : "pl-4"
-              }`}
-            >
-              <span className="font-display text-lg text-text">#{row.rank}</span>
-              <div>
-                <p className="text-text">{row.name}</p>
-                <p className="text-xs text-muted">Accuracy {row.accuracy}</p>
+          {/* Table rows */}
+          <div className="divide-y divide-border">
+            {leaderboard.map((row) => (
+              <div
+                key={row.rank}
+                className={`grid grid-cols-[80px_1fr_120px_120px] items-center gap-4 py-4 text-sm ${
+                  row.rank === 1 ? "border-l-2 border-l-gold/60 bg-gold/10 pl-4" : "pl-4"
+                }`}
+              >
+                <span className="font-display text-lg text-text">#{row.rank}</span>
+                <div>
+                  <p className="text-text">{row.name}</p>
+                  <p className="text-xs text-muted">Accuracy {row.accuracy}</p>
+                </div>
+                <span className="text-text">{row.streak} days</span>
+                <span className="text-text">{row.coins}</span>
               </div>
-              <span className="text-text">{row.streak} days</span>
-              <span className="text-text">{row.coins}</span>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </div>
     </SectionWrapper>

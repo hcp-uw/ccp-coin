@@ -51,7 +51,7 @@ export function HowItWorksSection() {
 
       {/* Mobile: vertical timeline */}
       <div className="mt-10 lg:hidden">
-        <div className="relative border-l border-gold/40 pl-8">
+        <div className="relative border-l border-gold/40 pl-12">
           {steps.map((step, index) => (
             <FadeIn
               key={step.title}
@@ -59,7 +59,7 @@ export function HowItWorksSection() {
               delay={index * 0.05}
             >
               {/* Circle node on the line */}
-              <div className="absolute -left-[calc(1rem+4.5px)] top-0 flex h-8 w-8 items-center justify-center rounded-full border border-gold/60 bg-obsidian text-xs font-semibold text-gold">
+              <div className="absolute -left-16 top-0 flex h-8 w-8 items-center justify-center rounded-full border border-gold/60 bg-obsidian text-xs font-semibold text-gold">
                 0{index + 1}
               </div>
               <h3 className="font-display text-2xl text-text">{step.title}</h3>
