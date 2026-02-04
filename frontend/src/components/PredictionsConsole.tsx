@@ -1,36 +1,57 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import type { AIInsight, Ticker } from "@/content/mockData";
+import { useOutsideClick } from "@/hooks/useOutsideClick";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 
 const focusableToggle = (value: "Up" | "Down") => value.toLowerCase();
 
 const sparklinePath = (points: number[]) => {
-  if (points.length === 0) return "";
+  if (points.length === 0) return { line: "", area: "" };
   const max = Math.max(...points);
   const min = Math.min(...points);
   const range = max - min || 1;
-  return points
-    .map((point, index) => {
-      const x = (index / (points.length - 1)) * 100;
-      const y = 32 - ((point - min) / range) * 32;
-      return `${index === 0 ? "M" : "L"}${x},${y}`;
-    })
+
+  const coords = points.map((point, index) => ({
+    x: (index / (points.length - 1)) * 100,
+    y: 32 - ((point - min) / range) * 32,
+  }));
+
+  const line = coords
+    .map((c, i) => `${i === 0 ? "M" : "L"}${c.x},${c.y}`)
     .join(" ");
+
+  // Area path: line path + close to bottom-right → bottom-left
+  const area = `${line} L100,32 L0,32 Z`;
+
+  return { line, area };
 };
 
-const Sparkline = ({ points }: { points: number[] }) => (
-  <svg viewBox="0 0 100 32" className="h-8 w-24">
-    <path
-      d={sparklinePath(points)}
-      fill="none"
-      stroke="rgba(198,161,91,0.8)"
-      strokeWidth="2"
-      strokeLinecap="round"
-    />
-  </svg>
-);
+const Sparkline = ({ points, symbol }: { points: number[]; symbol: string }) => {
+  const { line, area } = sparklinePath(points);
+  const gradientId = `sparkFill-${symbol}`;
+
+  return (
+    <svg viewBox="0 0 100 32" className="h-8 w-24">
+      <defs>
+        <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="rgba(198,161,91,0.3)" />
+          <stop offset="100%" stopColor="rgba(198,161,91,0)" />
+        </linearGradient>
+      </defs>
+      <path d={area} fill={`url(#${gradientId})`} />
+      <path
+        d={line}
+        fill="none"
+        stroke="rgba(198,161,91,0.8)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+};
 
 type PredictionsConsoleProps = {
   tickers: Ticker[];
@@ -43,6 +64,12 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
   const [toggles, setToggles] = useState<Record<string, "Up" | "Down">>(() =>
     Object.fromEntries(tickers.map((ticker) => [ticker.symbol, "Up"]))
   );
+
+  const consoleRef = useRef<HTMLDivElement>(null);
+  const closeAI = useCallback(() => setActiveAI(null), []);
+
+  useEscapeKey(closeAI, activeAI !== null);
+  useOutsideClick(consoleRef, closeAI, activeAI !== null);
 
   const handleToggle = (symbol: string, value: "Up" | "Down") => {
     setToggles((prev) => ({ ...prev, [symbol]: value }));
@@ -58,7 +85,7 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
   }, [activeAI, aiInsights]);
 
   return (
-    <div className="surface-card relative w-full max-w-xl overflow-visible rounded-[28px] border border-border bg-surface/80 p-6 shadow-glow">
+    <div ref={consoleRef} className="surface-card relative w-full max-w-xl overflow-visible rounded-[28px] border border-border bg-surface/80 p-6 shadow-glow">
       <div className="mb-6 flex items-center justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.28em] text-muted">Today&apos;s Predictions</p>
@@ -91,7 +118,7 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
                     {ticker.change}
                   </p>
                 </div>
-                <Sparkline points={ticker.sparkline} />
+                <Sparkline points={ticker.sparkline} symbol={ticker.symbol} />
                 <div className="flex items-center gap-2 rounded-full border border-border bg-obsidian/60 p-1 text-xs">
                   {["Up", "Down"].map((value) => (
                     <button

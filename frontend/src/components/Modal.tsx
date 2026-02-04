@@ -17,10 +17,11 @@ type ModalProps = {
   onClose: () => void;
   title: string;
   ariaLabel?: string;
+  ariaDescribedBy?: string;
   children: React.ReactNode;
 };
 
-export function Modal({ isOpen, onClose, title, ariaLabel, children }: ModalProps) {
+export function Modal({ isOpen, onClose, title, ariaLabel, ariaDescribedBy, children }: ModalProps) {
   const shouldReduceMotion = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
@@ -74,6 +75,7 @@ export function Modal({ isOpen, onClose, title, ariaLabel, children }: ModalProp
             role="dialog"
             aria-modal="true"
             aria-label={ariaLabel ?? title}
+            aria-describedby={ariaDescribedBy}
             className="surface-card w-full max-w-lg rounded-3xl border border-border bg-surface/95 p-6 shadow-glow"
             initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
