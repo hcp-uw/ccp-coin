@@ -1,6 +1,6 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Navbar } from "@/components/nav/Navbar";
+import { Navbar } from "@/components/landing/nav/Navbar";
 
 describe("Navbar", () => {
   const setup = () => {
