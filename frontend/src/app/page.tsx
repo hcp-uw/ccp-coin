@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { MotionConfig } from "framer-motion";
-import { content } from "@/content/content";
 import { Modal } from "@/components/Modal";
 import { Navbar } from "@/components/nav/Navbar";
 import { HeroSection } from "@/components/hero/HeroSection";
