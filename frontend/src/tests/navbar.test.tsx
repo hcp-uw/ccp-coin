@@ -1,6 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { describe, it, expect, vi } from "vitest";
 import { Navbar } from "@/components/landing/nav/Navbar";
+
+vi.mock("@/components/AudioController", () => ({
+  useAudio: () => ({
+    playSfx: vi.fn(),
+    isMuted: false,
+    toggleMute: vi.fn(),
+  }),
+  AudioToggle: () => <button>Toggle Sound</button>,
+}));
 
 describe("Navbar", () => {
   const setup = () => {
