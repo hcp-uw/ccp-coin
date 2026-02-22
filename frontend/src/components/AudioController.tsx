@@ -1,116 +1,149 @@
 "use client";
 
-import { createContext, useContext, useEffect, useRef, useState, ReactNode } from "react";
-import { FiVolumeX, FiVolume2 } from "react-icons/fi";
+import React, { createContext, useContext, useEffect, useRef, useState, ReactNode, useCallback } from "react";
+import { ArcadeButton } from "./shared/ArcadeButton";
 
-type AudioContextType = {
-  isMuted: boolean;
-  toggleMute: () => void;
-  playSfx: (type: "hover" | "click" | "up" | "down" | "start") => void;
-};
+// --- CONTEXT DEFINITION ---
+interface AudioContextType {
+    isMuted: boolean;
+    toggleMute: () => void;
+    // SFX triggers
+    playSfx: (type: "hover" | "click" | "up" | "down" | "start") => void;
+}
 
 const AudioContext = createContext<AudioContextType | undefined>(undefined);
 
 export function AudioProvider({ children }: { children: ReactNode }) {
-  // Start muted to respect autoplay policies
-  const [isMuted, setIsMuted] = useState(true);
+    const audioCtxRef = useRef<AudioContext | null>(null);
 
-  // We are not importing actual audio files yet; we will synthesize retro sounds
-  // using the Web Audio API for a true arcade feel.
-  const audioCtxRef = useRef<AudioContext | null>(null);
+    // Context exports
+    const [isMuted, setIsMuted] = useState(true); // Default muted to comply with autoplay policies
 
-  useEffect(() => {
-    // Only initialize on user interaction to comply with browser policies
-    if (!isMuted && !audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-  }, [isMuted]);
+    // Master Gain Nodes for mixing
+    const masterGainRef = useRef<GainNode | null>(null);
 
-  const toggleMute = () => {
-    setIsMuted(!isMuted);
-    if (isMuted && !audioCtxRef.current) {
-      audioCtxRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-    }
-  };
+    // --- AUDIO INITIALIZATION ---
+    const initAudio = () => {
+        if (audioCtxRef.current) return audioCtxRef.current;
 
-  const playSynth = (frequency: number, type: OscillatorType, duration: number, vol = 0.1) => {
-    if (isMuted || !audioCtxRef.current) return;
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        const ctx = new AudioContextClass();
+        audioCtxRef.current = ctx;
 
-    const ctx = audioCtxRef.current;
-    if (ctx.state === "suspended") ctx.resume();
+        masterGainRef.current = ctx.createGain();
+        masterGainRef.current.gain.value = 0.5; // Global volume
+        masterGainRef.current.connect(ctx.destination);
 
-    const osc = ctx.createOscillator();
-    const gainNode = ctx.createGain();
+        return ctx;
+    };
 
-    osc.type = type;
-    osc.frequency.setValueAtTime(frequency, ctx.currentTime);
+    // --- INSTRUMENT SYNTHESIS ---
 
-    gainNode.gain.setValueAtTime(vol, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + duration);
+    const playSynthesizer = useCallback((
+        ctx: AudioContext,
+        time: number,
+        freq: number,
+        type: OscillatorType,
+        duration: number,
+        dest: GainNode,
+        vol: number
+    ) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
 
-    osc.connect(gainNode);
-    gainNode.connect(ctx.destination);
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, time);
 
-    osc.start();
-    osc.stop(ctx.currentTime + duration);
-  };
+        // Envelope (Bulletproof method for cross-browser web audio)
+        // 1. Set to 0 immediately
+        gain.gain.setValueAtTime(0, time);
+        // 2. Attack: Ramp up to target volume quickly
+        gain.gain.setTargetAtTime(vol, time, 0.02);
+        // 3. Release: Let it ring for the duration then fade to 0
+        gain.gain.setTargetAtTime(0, time + duration - 0.05, 0.05);
 
-  const playSfx = (type: "hover" | "click" | "up" | "down" | "start") => {
-    if (isMuted) return;
+        osc.connect(gain);
+        gain.connect(dest);
 
-    switch (type) {
-      case "hover":
-        playSynth(440, "square", 0.1, 0.05);
-        break;
-      case "click":
-        playSynth(880, "square", 0.1, 0.1);
-        break;
-      case "up":
-        playSynth(1200, "square", 0.2, 0.15); // High pitch for up
-        setTimeout(() => playSynth(1600, "square", 0.3, 0.15), 100);
-        break;
-      case "down":
-        playSynth(300, "sawtooth", 0.2, 0.15); // Low pitch for down
-        setTimeout(() => playSynth(200, "sawtooth", 0.3, 0.15), 100);
-        break;
-      case "start":
-        // A mini arpeggio for "Start"
-        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
-          setTimeout(() => playSynth(freq, "square", 0.2, 0.1), i * 100);
-        });
-        break;
-    }
-  };
+        osc.start(time);
+        osc.stop(time + duration);
+    }, []);
 
-  return (
-    <AudioContext.Provider value={{ isMuted, toggleMute, playSfx }}>
-      {children}
-    </AudioContext.Provider>
-  );
+    // --- CONTROL EXPORTS ---
+
+    const playSfx = useCallback((type: "hover" | "click" | "up" | "down" | "start") => {
+        if (isMuted || !audioCtxRef.current || !masterGainRef.current) return;
+        const ctx = audioCtxRef.current;
+
+        if (ctx.state === "suspended") ctx.resume();
+
+        switch (type) {
+            case "hover":
+                playSynthesizer(ctx, ctx.currentTime, 440, "square", 0.1, masterGainRef.current, 0.05);
+                break;
+            case "click":
+                playSynthesizer(ctx, ctx.currentTime, 880, "square", 0.1, masterGainRef.current, 0.1);
+                break;
+            case "up":
+                playSynthesizer(ctx, ctx.currentTime, 1200, "square", 0.15, masterGainRef.current, 0.1);
+                setTimeout(() => playSynthesizer(ctx, ctx.currentTime + 0.1, 1600, "square", 0.2, masterGainRef.current!, 0.1), 10);
+                break;
+            case "down":
+                playSynthesizer(ctx, ctx.currentTime, 300, "sawtooth", 0.15, masterGainRef.current, 0.1);
+                setTimeout(() => playSynthesizer(ctx, ctx.currentTime + 0.1, 200, "sawtooth", 0.2, masterGainRef.current!, 0.1), 10);
+                break;
+            case "start":
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+                    setTimeout(() => playSynthesizer(ctx, ctx.currentTime + (i * 0.1), freq, "square", 0.2, masterGainRef.current!, 0.1), 10);
+                });
+                break;
+        }
+    }, [isMuted, playSynthesizer]);
+
+    const toggleMute = useCallback(() => {
+        // SYNCHRONOUS BROWSER UNLOCK: Must happen immediately on interaction (not inside state update queue)
+        const ctx = initAudio();
+        if (ctx.state === "suspended") {
+            ctx.resume().then(() => {
+                console.log("AudioContext resumed successfully on user interaction.");
+            }).catch(e => console.error("Failed to resume AudioContext", e));
+        }
+
+        setIsMuted((prev) => !prev);
+    }, []);
+
+    // Cleanup on unmount
+    useEffect(() => {
+        return () => { };
+    }, []);
+
+    return (
+        <AudioContext.Provider value={{ isMuted, toggleMute, playSfx }}>
+            {children}
+        </AudioContext.Provider>
+    );
 }
 
+// Custom hook to consume the Context
 export function useAudio() {
-  const context = useContext(AudioContext);
-  if (context === undefined) {
-    throw new Error("useAudio must be used within an AudioProvider");
-  }
-  return context;
+    const context = useContext(AudioContext);
+    if (!context) {
+        throw new Error("useAudio must be used within an AudioProvider");
+    }
+    return context;
 }
 
 export function AudioToggle() {
-  const { isMuted, toggleMute, playSfx } = useAudio();
+    // Only used to demonstrate/export the audio component standalone if needed
+    const { isMuted, toggleMute, playSfx } = useAudio();
 
-  return (
-    <button
-      onClick={() => {
-        toggleMute();
-        if (isMuted) playSfx("start"); // Play sound when unmuting
-      }}
-      className="flex items-center gap-2 rounded-none border-[2px] border-primary bg-obsidian px-3 py-1 font-arcade text-[10px] text-primary transition-colors hover:bg-primary hover:text-obsidian"
-      aria-label={isMuted ? "Unmute sound" : "Mute sound"}
-    >
-      {isMuted ? <FiVolumeX size={14} /> : <FiVolume2 size={14} />}
-      <span className="hidden sm:inline">{isMuted ? "SND: OFF" : "SND: ON"}</span>
-    </button>
-  );
+    return (
+        <ArcadeButton
+            variant="danger"
+            onClick={() => { playSfx("click"); toggleMute(); }}
+            onMouseEnter={() => playSfx("hover")}
+        >
+            {isMuted ? "SND: OFF" : "SND: ON"}
+        </ArcadeButton>
+    );
 }
