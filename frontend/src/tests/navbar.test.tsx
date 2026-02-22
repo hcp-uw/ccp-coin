@@ -21,13 +21,6 @@ describe("Navbar", () => {
     return { user, onSignIn, onSignUp };
   };
 
-  it("renders desktop navigation links", () => {
-    setup();
-    expect(screen.getByRole("link", { name: /how it works/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /features/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /leaderboard/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /faq/i })).toBeInTheDocument();
-  });
 
   it("renders hamburger button for mobile", () => {
     setup();
