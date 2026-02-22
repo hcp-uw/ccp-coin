@@ -66,8 +66,8 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
         onMouseEnter={() => playSfx("hover")}
         onClick={(e) => { e.stopPropagation(); playSfx("up"); onChange("Up"); }}
         className={`border-[2px] px-3 py-1 font-arcade text-[10px] transition-all ${value === "Up"
-            ? "border-up bg-up text-obsidian shadow-[0px_0px_10px_0px_rgba(0,255,65,0.8)]"
-            : "border-border bg-obsidian text-muted hover:border-up/50 hover:text-up"
+          ? "border-up bg-up text-obsidian shadow-[0px_0px_10px_0px_rgba(0,255,65,0.8)]"
+          : "border-border bg-obsidian text-muted hover:border-up/50 hover:text-up"
           }`}
       >
         UP
@@ -77,8 +77,8 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
         onMouseEnter={() => playSfx("hover")}
         onClick={(e) => { e.stopPropagation(); playSfx("down"); onChange("Down"); }}
         className={`border-[2px] px-3 py-1 font-arcade text-[10px] transition-all ${value === "Down"
-            ? "border-down bg-down text-obsidian shadow-[0px_0px_10px_0px_rgba(255,0,85,0.8)]"
-            : "border-border bg-obsidian text-muted hover:border-down/50 hover:text-down"
+          ? "border-down bg-down text-obsidian shadow-[0px_0px_10px_0px_rgba(255,0,85,0.8)]"
+          : "border-border bg-obsidian text-muted hover:border-down/50 hover:text-down"
           }`}
       >
         DWN
@@ -87,16 +87,61 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
   );
 };
 
-const StakeChip = () => (
-  <button
-    type="button"
-    onClick={(e) => e.stopPropagation()}
-    className="flex items-center gap-2 border-[2px] border-border bg-obsidian px-3 py-1.5 font-arcade text-[8px] text-muted transition-colors hover:border-xp hover:text-text"
-  >
-    <span>STAKE: <span className="text-xp">50</span></span>
-    <FiChevronDown className="opacity-50" />
-  </button>
-);
+const StakeDropdown = ({ playSfx }: { playSfx: any }) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [stake, setStake] = useState<number | string>(50);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(dropdownRef, () => setIsOpen(false), isOpen);
+  useEscapeKey(() => setIsOpen(false), isOpen);
+
+  const stakes = [10, 50, 100, 500, "MAX"];
+
+  const handleSelect = (e: React.MouseEvent, val: number | string) => {
+    e.stopPropagation();
+    playSfx("click");
+    setStake(val);
+    setIsOpen(false);
+  };
+
+  return (
+    <div className="relative" ref={dropdownRef}>
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); playSfx("click"); setIsOpen(!isOpen); }}
+        className={`flex items-center gap-2 border-[2px] px-3 py-1.5 font-arcade text-[8px] transition-colors ${isOpen ? "border-xp text-text bg-white/5" : "border-border bg-obsidian text-muted hover:border-xp hover:text-text"}`}
+      >
+        <span>STAKE: <span className="text-xp">{stake}</span></span>
+        <FiChevronDown className={`opacity-50 transition-transform ${isOpen ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            className="absolute left-0 top-full z-20 mt-1 w-full border-[2px] border-xp bg-obsidian shadow-[4px_4px_0px_0px_rgba(255,215,0,0.3)]"
+          >
+            <div className="flex flex-col">
+              {stakes.map((val) => (
+                <button
+                  key={val}
+                  type="button"
+                  onClick={(e) => handleSelect(e, val)}
+                  onMouseEnter={() => playSfx("hover")}
+                  className={`px-3 py-2 text-left font-arcade text-[8px] hover:bg-white/10 ${stake === val ? "text-xp" : "text-muted"}`}
+                >
+                  {val}
+                </button>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+};
 
 const AIPopover = ({
   insight,
@@ -120,7 +165,7 @@ const AIPopover = ({
           <span>AI SYSTEM</span>
         </div>
         <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="font-arcade text-[8px] text-muted hover:text-text">
-          [X] CLOSE
+          [ESC] CLOSE
         </button>
       </div>
 
@@ -260,7 +305,7 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
 
                   {/* 4. Stake Chip (Desktop) */}
                   <div className="hidden md:block">
-                    <StakeChip />
+                    <StakeDropdown playSfx={playSfx} />
                   </div>
 
                   {/* 5. Toggle */}

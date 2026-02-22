@@ -19,6 +19,8 @@
   /* Status Colors */
   --color-up: 0 255 65;
   --color-down: 255 0 85;
+  --color-danger: 255 10 30;
+  /* Bright retro red */
 
   /* Gamification */
   --color-xp: 255 215 0;

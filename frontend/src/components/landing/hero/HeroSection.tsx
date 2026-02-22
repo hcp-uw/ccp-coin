@@ -6,6 +6,7 @@ import { content } from "@/content/content";
 import { tickers, aiInsights } from "@/content/mockData";
 import { PredictionsConsole } from "@/components/PredictionsConsole";
 import { useAudio } from "@/components/AudioController";
+import { ArcadeButton } from "@/components/shared/ArcadeButton";
 
 type HeroSectionProps = {
   onSignUp: () => void;
@@ -49,29 +50,28 @@ export function HeroSection({ onSignUp, onOpenHow, onOpenFAQ, onOpenLeaderboard 
             PRESS START
           </motion.button>
 
-          {/* Secondary Arcade Menu */}
           <div className="flex flex-wrap justify-center lg:justify-start gap-4 font-arcade text-[10px] text-muted pt-4 w-full max-w-sm">
-            <button
+            <ArcadeButton
+              variant="neutral"
               onClick={() => { playSfx("click"); onOpenLeaderboard(); }}
               onMouseEnter={() => playSfx("hover")}
-              className="border-[2px] border-border bg-obsidian px-4 py-2 hover:border-xp hover:text-xp transition-colors"
             >
               HIGH SCORES
-            </button>
-            <button
+            </ArcadeButton>
+            <ArcadeButton
+              variant="neutral"
               onClick={() => { playSfx("click"); onOpenHow(); }}
               onMouseEnter={() => playSfx("hover")}
-              className="border-[2px] border-border bg-obsidian px-4 py-2 hover:border-primary hover:text-primary transition-colors"
             >
               HOW TO PLAY
-            </button>
-            <button
+            </ArcadeButton>
+            <ArcadeButton
+              variant="neutral"
               onClick={() => { playSfx("click"); onOpenFAQ(); }}
               onMouseEnter={() => playSfx("hover")}
-              className="border-[2px] border-border bg-obsidian px-4 py-2 hover:border-secondary hover:text-secondary transition-colors"
             >
               SYSTEM FAQ
-            </button>
+            </ArcadeButton>
           </div>
         </div>
       </div>

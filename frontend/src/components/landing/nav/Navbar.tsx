@@ -5,7 +5,7 @@ import { FiMenu } from "react-icons/fi";
 import { content } from "@/content/content";
 import { MobileMenu } from "./MobileMenu";
 import { AudioToggle, useAudio } from "@/components/AudioController";
-import { motion } from "framer-motion";
+import { ArcadeButton } from "@/components/shared/ArcadeButton";
 
 type NavbarProps = {
   onSignIn: () => void;
@@ -19,37 +19,41 @@ export function Navbar({ onSignIn, onSignUp }: NavbarProps) {
   return (
     <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
-        <div className="flex items-center gap-3">
-          <span className="font-arcade text-lg text-primary">{content.nav.wordmark}</span>
-          <span className="border-[2px] border-border bg-surface/60 px-2 py-1 font-arcade text-[8px] uppercase text-muted">
-            {content.nav.uwTag}
-          </span>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <span className="font-arcade text-lg text-primary">{content.nav.wordmark}</span>
+            <span className="border-[2px] border-border bg-surface/60 px-2 py-1 font-arcade text-[8px] uppercase text-muted">
+              {content.nav.uwTag}
+            </span>
+          </div>
+
+          <div className="hidden items-center md:block">
+            {/* Audio Toggle exported from component directly now? No, it's a separate component. */}
+          </div>
         </div>
 
 
 
         {/* Desktop Controls */}
-        <div className="hidden items-center gap-4 md:flex">
-          <AudioToggle />
+        <div className="hidden items-center gap-6 md:flex">
+          <div className="mr-2">
+            <AudioToggle />
+          </div>
 
-          <button
-            type="button"
+          <ArcadeButton
+            variant="success"
             onClick={() => { playSfx("click"); onSignIn(); }}
             onMouseEnter={() => playSfx("hover")}
-            className="border-[2px] border-border bg-surface px-4 py-2 font-arcade text-[10px] uppercase text-text transition-colors hover:bg-white/10"
           >
             {content.nav.signIn}
-          </button>
-          <motion.button
-            whileTap={{ scale: 0.95, y: 2, boxShadow: "0px 0px 0px 0px rgba(255, 215, 0, 1)" }}
-            type="button"
+          </ArcadeButton>
+          <ArcadeButton
+            variant="warning"
             onClick={() => { playSfx("start"); onSignUp(); }}
             onMouseEnter={() => playSfx("hover")}
-            style={{ boxShadow: "4px 4px 0px 0px rgba(255, 215, 0, 1)" }}
-            className="border-[2px] border-xp bg-xp/20 px-4 py-2 font-arcade text-[10px] uppercase text-xp transition-colors hover:bg-xp/40"
           >
             {content.nav.signUp}
-          </motion.button>
+          </ArcadeButton>
         </div>
 
         {/* Mobile controls */}
@@ -75,6 +79,6 @@ export function Navbar({ onSignIn, onSignUp }: NavbarProps) {
         signInLabel={content.nav.signIn}
         signUpLabel={content.nav.signUp}
       />
-    </header>
+    </header >
   );
 }

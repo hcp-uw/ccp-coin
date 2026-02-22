@@ -9,6 +9,7 @@ import { HowItWorksSection } from "@/components/landing/how-it-works/HowItWorksS
 import { FAQSection } from "@/components/landing/faq/FAQSection";
 import { LeaderboardSection } from "@/components/landing/leaderboard/LeaderboardSection";
 import { useAudio } from "@/components/AudioController";
+import { useEscapeKey } from "@/hooks/useEscapeKey";
 
 export default function Page() {
   const [activeModal, setActiveModal] = useState<"signin" | "signup" | "how" | "faq" | "leaderboard" | null>(null);
@@ -22,6 +23,8 @@ export default function Page() {
     setActiveModal(null);
   };
 
+  useEscapeKey(closeModal, activeModal !== null);
+
   const RetroModal = ({ title, isOpen, children }: { title: string, isOpen: boolean, children: React.ReactNode }) => {
     if (!isOpen) return null;
     return (
@@ -32,7 +35,7 @@ export default function Page() {
             onClick={closeModal}
             className="absolute right-4 top-4 border-[2px] border-border bg-surface px-3 py-1 font-arcade text-xs text-muted hover:bg-white/10 hover:text-text"
           >
-            [X] CLOSE
+            [ESC] CLOSE
           </button>
           <div className="mb-8 border-b-[2px] border-border pb-4">
             <h2 className="font-arcade text-2xl text-primary md:text-3xl">{title}</h2>

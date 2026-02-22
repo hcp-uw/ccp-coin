@@ -15,7 +15,8 @@ const config: Config = {
         secondary: "rgb(var(--color-secondary) / <alpha-value>)",
         up: "rgb(var(--color-up) / <alpha-value>)",
         down: "rgb(var(--color-down) / <alpha-value>)",
-        xp: "rgb(var(--color-xp) / <alpha-value>)"
+        xp: "rgb(var(--color-xp) / <alpha-value>)",
+        danger: "rgb(var(--color-danger) / <alpha-value>)"
       },
       fontFamily: {
         sans: ["var(--font-mono)", "monospace"], // Defaulting everything to mono for the terminal feel
