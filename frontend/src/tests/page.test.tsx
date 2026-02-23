@@ -1,7 +1,7 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import Page from "@/app/page";
-import { tickers, aiInsights } from "@/content/mockData";
+import { aiInsights } from "@/content/mockData";
 
 describe("DubQuant landing page", () => {
   const setup = () => {
@@ -13,19 +13,17 @@ describe("DubQuant landing page", () => {
   describe("Predictions Console", () => {
     it("toggles prediction direction between Up and Down", async () => {
       const { user } = setup();
-      
+
       // Find the first ticker's toggle group (e.g., AAPL)
-      const aaplRow = screen.getByText("AAPL").closest('.relative');
+      const aaplRow = screen.getByText("AAPL").closest('.relative') as HTMLElement;
       expect(aaplRow).toBeInTheDocument();
-      
-      if (!aaplRow) return; // Guard for typescript
 
       const upButton = within(aaplRow).getByRole("button", { name: /aapl up/i });
       const downButton = within(aaplRow).getByRole("button", { name: /aapl down/i });
 
-      // Check initial state (mock data defaults to "Up" via state init logic if simple, 
-      // but component logic initializes `toggles` state)
-      expect(upButton).toHaveAttribute("aria-pressed", "true");
+      // Check initial state. The state is originally empty so neither is pressed.
+      expect(upButton).toHaveAttribute("aria-pressed", "false");
+      expect(downButton).toHaveAttribute("aria-pressed", "false");
       expect(downButton).toHaveAttribute("aria-pressed", "false");
 
       // Click Down
@@ -49,7 +47,7 @@ describe("DubQuant landing page", () => {
       await user.click(aiButton);
 
       const panel = await screen.findByTestId("ai-panel");
-      
+
       // Verify Header
       expect(within(panel).getByText(symbol)).toBeInTheDocument();
       expect(within(panel).getByText("AI Insight")).toBeInTheDocument();
@@ -57,9 +55,9 @@ describe("DubQuant landing page", () => {
       // Verify Data Integrity
       expect(within(panel).getByText(`${insight.confidence}%`)).toBeInTheDocument();
       expect(within(panel).getByText(insight.suggestion)).toBeInTheDocument();
-      
+
       // Verify Rationale
-      const rationaleList = within(panel).getByText("Why").nextElementSibling;
+      const rationaleList = within(panel).getByText("Analysis").nextElementSibling;
       expect(rationaleList).toHaveTextContent(insight.rationale[0]);
     });
   });
@@ -69,9 +67,9 @@ describe("DubQuant landing page", () => {
       const { user } = setup();
 
       await user.click(screen.getByRole("button", { name: /sign in/i }));
-      
+
       const modal = await screen.findByRole("dialog", { name: /sign in to dubquant/i });
-      
+
       // Verify form elements exist
       expect(within(modal).getByLabelText(/uw email/i)).toBeInTheDocument();
       expect(within(modal).getByLabelText(/password/i)).toBeInTheDocument();
@@ -94,7 +92,7 @@ describe("DubQuant landing page", () => {
 
       await user.click(screen.getByRole("button", { name: /sign in/i }));
       const modal = await screen.findByRole("dialog");
-      
+
       const closeButton = within(modal).getByRole("button", { name: /close/i });
       await user.click(closeButton);
 
@@ -107,13 +105,13 @@ describe("DubQuant landing page", () => {
   describe("Leaderboard", () => {
     it("renders top students with correct rank styling", () => {
       setup();
-      
+
       const leaderboardSection = screen.getByTestId("leaderboard");
       const topStudent = within(leaderboardSection).getByText("A. Park");
-      
+
       // Verify content is present
       expect(topStudent).toBeInTheDocument();
-      
+
       // Verify ranking logic (visual check via class presence implies logic ran)
       // Rank 1 has specific styling 'bg-gold/10'
       // The text is inside a div, which is inside the row div.

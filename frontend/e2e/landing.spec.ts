@@ -28,7 +28,6 @@ test.describe("DubQuant landing page E2E", () => {
   test("Sign In modal opens and Escape closes", async ({ page }) => {
     // Click desktop Sign In button and wait for dialog
     await page.locator("header").getByRole("button", { name: /sign in/i }).click();
-    await page.waitForTimeout(500);
 
     // Check for dialog via selector (framer-motion creates it dynamically)
     const dialog = page.locator('[role="dialog"]');
@@ -43,7 +42,6 @@ test.describe("DubQuant landing page E2E", () => {
     const aiButton = page.getByLabel(/open ai insight for aapl/i);
     await aiButton.scrollIntoViewIfNeeded();
     await aiButton.click();
-    await page.waitForTimeout(500);
 
     const panel = page.locator('[data-testid="ai-panel"]');
     await expect(panel).toBeVisible({ timeout: 10000 });
@@ -54,12 +52,10 @@ test.describe("DubQuant landing page E2E", () => {
 
   test("mobile nav — hamburger opens and link click closes", async ({ page }) => {
     await page.setViewportSize({ width: 375, height: 812 });
-    await page.waitForTimeout(500);
 
     const hamburger = page.getByLabel(/open menu/i);
     await expect(hamburger).toBeVisible({ timeout: 10000 });
     await hamburger.click();
-    await page.waitForTimeout(500);
 
     const mobileDialog = page.locator('[role="dialog"][aria-label="Mobile navigation"]');
     await expect(mobileDialog).toBeVisible({ timeout: 10000 });

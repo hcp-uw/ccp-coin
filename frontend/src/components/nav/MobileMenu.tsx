@@ -5,6 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { GoldThread } from "@/components/shared/GoldThread";
 
 const focusableSelector = [
   "a[href]",
@@ -123,7 +124,7 @@ export function MobileMenu({
                 </a>
               ))}
 
-              <div className="gold-thread" />
+              <GoldThread />
 
               <button
                 type="button"
