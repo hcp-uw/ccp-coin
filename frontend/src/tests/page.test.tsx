@@ -1,4 +1,4 @@
-import { render, screen, within, waitFor, act } from "@testing-library/react";
+import { render, screen, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import Page from "@/app/page";

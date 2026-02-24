@@ -105,7 +105,9 @@ export function AudioProvider({ children }: { children: ReactNode }) {
         const ctx = initAudio();
         if (ctx.state === "suspended") {
             ctx.resume().then(() => {
-                console.log("AudioContext resumed successfully on user interaction.");
+                if (process.env.NODE_ENV !== "production") {
+                    console.log("AudioContext resumed successfully on user interaction.");
+                }
             }).catch(e => console.error("Failed to resume AudioContext", e));
         }
 

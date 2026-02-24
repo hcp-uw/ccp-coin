@@ -26,10 +26,6 @@ export function Navbar({ onSignIn, onSignUp }: NavbarProps) {
               {content.nav.uwTag}
             </span>
           </div>
-
-          <div className="hidden items-center md:block">
-            {/* Audio Toggle exported from component directly now? No, it's a separate component. */}
-          </div>
         </div>
 
 

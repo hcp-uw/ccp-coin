@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import type { ReactNode } from "react";
 import { MotionConfig } from "framer-motion";
 import { Navbar } from "@/components/landing/nav/Navbar";
 import { HeroSection } from "@/components/landing/hero/HeroSection";
@@ -25,11 +26,16 @@ export default function Page() {
 
   useEscapeKey(closeModal, activeModal !== null);
 
-  const RetroModal = ({ title, isOpen, children }: { title: string, isOpen: boolean, children: React.ReactNode }) => {
+  const RetroModal = ({ title, isOpen, children }: { title: string, isOpen: boolean, children: ReactNode }) => {
     if (!isOpen) return null;
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian/90 p-4 backdrop-blur-sm">
-        <div className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto border-[4px] border-primary bg-obsidian p-6 shadow-[8px_8px_0px_0px_rgba(0,240,255,0.4)] md:p-10">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="retro-modal-title"
+          className="relative max-h-[90vh] w-full max-w-4xl overflow-y-auto border-[4px] border-primary bg-obsidian p-6 shadow-[8px_8px_0px_0px_rgba(0,240,255,0.4)] md:p-10"
+        >
           <button
             type="button"
             onClick={closeModal}
@@ -38,7 +44,7 @@ export default function Page() {
             [ESC] CLOSE
           </button>
           <div className="mb-8 border-b-[2px] border-border pb-4">
-            <h2 className="font-arcade text-2xl text-primary md:text-3xl">{title}</h2>
+            <h2 id="retro-modal-title" className="font-arcade text-2xl text-primary md:text-3xl">{title}</h2>
           </div>
           <div className="prose prose-invert max-w-none font-mono text-text">
             {children}

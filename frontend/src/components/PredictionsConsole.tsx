@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import type { MouseEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiCpu, FiChevronDown } from "react-icons/fi";
 import type { AIInsight, Ticker } from "@/content/mockData";
@@ -63,6 +64,7 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
     <div className="flex gap-2 p-1">
       <button
         type="button"
+        aria-pressed={value === "Up"}
         onMouseEnter={() => playSfx("hover")}
         onClick={(e) => { e.stopPropagation(); playSfx("up"); onChange("Up"); }}
         className={`border-[2px] px-3 py-1 font-arcade text-[10px] transition-all ${value === "Up"
@@ -74,6 +76,7 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
       </button>
       <button
         type="button"
+        aria-pressed={value === "Down"}
         onMouseEnter={() => playSfx("hover")}
         onClick={(e) => { e.stopPropagation(); playSfx("down"); onChange("Down"); }}
         className={`border-[2px] px-3 py-1 font-arcade text-[10px] transition-all ${value === "Down"
@@ -87,7 +90,7 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
   );
 };
 
-const StakeDropdown = ({ playSfx }: { playSfx: any }) => {
+const StakeDropdown = ({ playSfx }: { playSfx: (type: "hover" | "click" | "up" | "down" | "start") => void }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [stake, setStake] = useState<number | string>(50);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -97,7 +100,7 @@ const StakeDropdown = ({ playSfx }: { playSfx: any }) => {
 
   const stakes = [10, 50, 100, 500, "MAX"];
 
-  const handleSelect = (e: React.MouseEvent, val: number | string) => {
+  const handleSelect = (e: MouseEvent, val: number | string) => {
     e.stopPropagation();
     playSfx("click");
     setStake(val);
@@ -231,7 +234,7 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
     setPredictions(prev => ({ ...prev, [symbol]: value }));
   };
 
-  const handleAI = (e: React.MouseEvent, symbol: string) => {
+  const handleAI = (e: MouseEvent, symbol: string) => {
     e.stopPropagation();
     playSfx("click");
     setActiveAI(prev => prev === symbol ? null : symbol);

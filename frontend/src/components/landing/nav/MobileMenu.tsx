@@ -124,7 +124,7 @@ export function MobileMenu({
                 </a>
               ))}
 
-              <div className="gold-thread" />
+              <div className="my-2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
               <ArcadeButton
                 variant="success"

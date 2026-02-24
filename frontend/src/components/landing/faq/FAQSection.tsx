@@ -11,11 +11,11 @@ export function FAQSection() {
         {faqs.map((faq, index) => (
           <FadeIn key={faq.question} delay={index * 0.1}>
             <details className="group border-[2px] border-border bg-obsidian mb-2">
-              <summary className="faq-summary flex w-full cursor-pointer items-center gap-4 py-4 px-4 font-arcade text-[10px] text-text transition-colors hover:bg-white/[0.05] hover:text-secondary">
+              <summary className="list-none [&::-webkit-details-marker]:hidden flex w-full cursor-pointer items-center gap-4 py-4 px-4 font-arcade text-[10px] text-text transition-colors hover:bg-white/[0.05] hover:text-secondary">
                 <span className="text-secondary">[{index + 1}]</span>
                 {faq.question}
                 <svg
-                  className="faq-chevron ml-auto h-4 w-4 shrink-0 text-secondary transition-transform group-open:rotate-180"
+                  className="ml-auto h-4 w-4 shrink-0 text-secondary transition-transform group-open:rotate-180"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
