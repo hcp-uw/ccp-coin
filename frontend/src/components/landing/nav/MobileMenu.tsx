@@ -5,7 +5,7 @@ import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { FiX } from "react-icons/fi";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { GoldThread } from "@/components/shared/GoldThread";
+import { ArcadeButton } from "../../shared/ArcadeButton";
 
 const focusableSelector = [
   "a[href]",
@@ -124,28 +124,26 @@ export function MobileMenu({
                 </a>
               ))}
 
-              <GoldThread />
+              <div className="my-2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-              <button
-                type="button"
+              <ArcadeButton
+                variant="success"
                 onClick={() => {
                   onClose();
                   onSignIn();
                 }}
-                className="rounded-full border border-border bg-surface/70 px-4 py-2 text-sm uppercase tracking-[0.2em] text-muted transition hover:text-text"
               >
                 {signInLabel}
-              </button>
-              <button
-                type="button"
+              </ArcadeButton>
+              <ArcadeButton
+                variant="warning"
                 onClick={() => {
                   onClose();
                   onSignUp();
                 }}
-                className="rounded-full bg-gold/90 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-obsidian transition hover:bg-gold"
               >
                 {signUpLabel}
-              </button>
+              </ArcadeButton>
             </nav>
           </motion.div>
         </motion.div>

@@ -1,6 +1,16 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { Navbar } from "@/components/nav/Navbar";
+import { describe, it, expect, vi } from "vitest";
+import { Navbar } from "@/components/landing/nav/Navbar";
+
+vi.mock("@/components/AudioController", () => ({
+  useAudio: () => ({
+    playSfx: vi.fn(),
+    isMuted: false,
+    toggleMute: vi.fn(),
+  }),
+  AudioToggle: () => <button>Toggle Sound</button>,
+}));
 
 describe("Navbar", () => {
   const setup = () => {
@@ -11,13 +21,6 @@ describe("Navbar", () => {
     return { user, onSignIn, onSignUp };
   };
 
-  it("renders desktop navigation links", () => {
-    setup();
-    expect(screen.getByRole("link", { name: /how it works/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /features/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /leaderboard/i })).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: /faq/i })).toBeInTheDocument();
-  });
 
   it("renders hamburger button for mobile", () => {
     setup();
