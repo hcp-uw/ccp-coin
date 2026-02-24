@@ -61,10 +61,11 @@ type SegmentedToggleProps = {
 
 const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => {
   return (
-    <div className="flex gap-2 p-1">
+    <div role="radiogroup" aria-label="Prediction direction" className="flex gap-2 p-1">
       <button
         type="button"
-        aria-pressed={value === "Up"}
+        role="radio"
+        aria-checked={value === "Up"}
         onMouseEnter={() => playSfx("hover")}
         onClick={(e) => { e.stopPropagation(); playSfx("up"); onChange("Up"); }}
         className={`border-[2px] px-3 py-1 font-arcade text-[10px] transition-all ${value === "Up"
@@ -76,7 +77,8 @@ const SegmentedToggle = ({ value, onChange, playSfx }: SegmentedToggleProps) => 
       </button>
       <button
         type="button"
-        aria-pressed={value === "Down"}
+        role="radio"
+        aria-checked={value === "Down"}
         onMouseEnter={() => playSfx("hover")}
         onClick={(e) => { e.stopPropagation(); playSfx("down"); onChange("Down"); }}
         className={`border-[2px] px-3 py-1 font-arcade text-[10px] transition-all ${value === "Down"

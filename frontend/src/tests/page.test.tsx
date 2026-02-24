@@ -30,18 +30,22 @@ describe("DubQuant Arcade Landing Page", () => {
 
       if (!aaplRow) return;
 
-      const upButton = within(aaplRow).getByRole("button", { name: /up/i });
-      const downButton = within(aaplRow).getByRole("button", { name: /dwn/i });
+      const upButton = within(aaplRow).getByRole("radio", { name: /up/i });
+      const downButton = within(aaplRow).getByRole("radio", { name: /dwn/i });
 
       // Click UP
       await user.click(upButton);
       expect(upButton).toHaveClass("bg-up");
+      expect(upButton).toHaveAttribute("aria-checked", "true");
       expect(downButton).not.toHaveClass("bg-down");
+      expect(downButton).toHaveAttribute("aria-checked", "false");
 
       // Click DWN
       await user.click(downButton);
       expect(downButton).toHaveClass("bg-down");
+      expect(downButton).toHaveAttribute("aria-checked", "true");
       expect(upButton).not.toHaveClass("bg-up");
+      expect(upButton).toHaveAttribute("aria-checked", "false");
     });
 
     it("displays correct AI insights including confidence scores", async () => {
