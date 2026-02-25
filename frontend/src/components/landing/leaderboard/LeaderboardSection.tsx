@@ -2,10 +2,10 @@
 
 import { motion } from "framer-motion";
 import { FiTrendingUp } from "react-icons/fi";
-import { leaderboard } from "@/content/mockData";
-import { FadeIn } from "@/components/shared/FadeIn";
+import { leaderboard, type LeaderboardRow } from "@/content/mockData";
 
-export function LeaderboardSection() {
+export function LeaderboardSection({ data, highlightRank }: { data?: LeaderboardRow[]; highlightRank?: number } = {}) {
+  const rows = data ?? leaderboard;
   return (
     <div id="leaderboard" className="w-full">
       <div className="flex items-center gap-2 mb-4 border-[2px] border-border bg-obsidian px-4 py-2 font-arcade text-[8px] text-muted w-fit tracking-widest">
@@ -25,12 +25,11 @@ export function LeaderboardSection() {
 
           {/* Table rows */}
           <div className="divide-y-[2px] divide-border bg-obsidian">
-            {leaderboard.map((row) => (
+            {rows.map((row) => (
               <motion.div
                 key={row.rank}
                 whileHover={{ backgroundColor: "rgba(255,255,255,0.05)", x: 4 }}
-                className={`grid grid-cols-[80px_1fr_120px_150px] items-center gap-4 px-6 py-4 text-sm font-mono transition-colors ${row.rank === 1 ? "bg-xp/5" : ""
-                  }`}
+                className={`grid grid-cols-[80px_1fr_120px_150px] items-center gap-4 px-6 py-4 text-sm font-mono transition-colors ${[row.rank === 1 ? "bg-xp/5" : "", row.rank === highlightRank ? "bg-primary/5 border-l-[2px] border-primary" : ""].filter(Boolean).join(" ")}`}
               >
                 <div className="flex items-center gap-2">
                   <span className={`font-arcade text-sm ${row.rank === 1 ? "text-xp animate-pulse" : "text-muted"}`}>
