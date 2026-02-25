@@ -16,25 +16,29 @@ const focusableSelector = [
   "[tabindex]:not([tabindex='-1'])",
 ].join(",");
 
-type MobileMenuProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  links: { label: string; href: string }[];
-  onSignIn: () => void;
-  onSignUp: () => void;
-  signInLabel: string;
-  signUpLabel: string;
-};
+type MobileMenuProps =
+  | {
+      isOpen: boolean;
+      onClose: () => void;
+      links: { label: string; href: string }[];
+      variant: "public";
+      onSignIn: () => void;
+      onSignUp: () => void;
+      signInLabel: string;
+      signUpLabel: string;
+    }
+  | {
+      isOpen: boolean;
+      onClose: () => void;
+      links: { label: string; href: string }[];
+      variant: "dashboard";
+      onLogout: () => void;
+      onProfile: () => void;
+      username: string;
+    };
 
-export function MobileMenu({
-  isOpen,
-  onClose,
-  links,
-  onSignIn,
-  onSignUp,
-  signInLabel,
-  signUpLabel,
-}: MobileMenuProps) {
+export function MobileMenu(props: MobileMenuProps) {
+  const { isOpen, onClose, links } = props;
   const shouldReduceMotion = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
@@ -47,18 +51,14 @@ export function MobileMenu({
 
     lastActiveRef.current = document.activeElement as HTMLElement | null;
 
-    // Focus the first focusable element inside the panel
     const panel = panelRef.current;
     const focusables = panel?.querySelectorAll<HTMLElement>(focusableSelector);
     focusables?.[0]?.focus();
 
-    // Focus trap
     const handleKey = (event: KeyboardEvent) => {
       if (event.key !== "Tab" || !focusables || focusables.length === 0) return;
-
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
-
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last?.focus();
@@ -126,24 +126,37 @@ export function MobileMenu({
 
               <div className="my-2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-              <ArcadeButton
-                variant="success"
-                onClick={() => {
-                  onClose();
-                  onSignIn();
-                }}
-              >
-                {signInLabel}
-              </ArcadeButton>
-              <ArcadeButton
-                variant="warning"
-                onClick={() => {
-                  onClose();
-                  onSignUp();
-                }}
-              >
-                {signUpLabel}
-              </ArcadeButton>
+              {props.variant === "dashboard" ? (
+                <>
+                  <ArcadeButton
+                    variant="neutral"
+                    onClick={() => { onClose(); props.onProfile(); }}
+                  >
+                    PROFILE
+                  </ArcadeButton>
+                  <ArcadeButton
+                    variant="danger"
+                    onClick={() => { onClose(); props.onLogout(); }}
+                  >
+                    LOGOUT
+                  </ArcadeButton>
+                </>
+              ) : (
+                <>
+                  <ArcadeButton
+                    variant="success"
+                    onClick={() => { onClose(); props.onSignIn(); }}
+                  >
+                    {props.signInLabel}
+                  </ArcadeButton>
+                  <ArcadeButton
+                    variant="warning"
+                    onClick={() => { onClose(); props.onSignUp(); }}
+                  >
+                    {props.signUpLabel}
+                  </ArcadeButton>
+                </>
+              )}
             </nav>
           </motion.div>
         </motion.div>

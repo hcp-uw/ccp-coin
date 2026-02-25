@@ -7,45 +7,75 @@ import { MobileMenu } from "./MobileMenu";
 import { AudioToggle, useAudio } from "@/components/AudioController";
 import { ArcadeButton } from "@/components/shared/ArcadeButton";
 
-type NavbarProps = {
-  onSignIn: () => void;
-  onSignUp: () => void;
-};
+type NavbarProps =
+  | { variant: "public"; onSignIn: () => void; onSignUp: () => void }
+  | { variant: "dashboard"; username: string; onLogout: () => void; onProfile: () => void };
 
-export function Navbar({ onSignIn, onSignUp }: NavbarProps) {
+export function Navbar(props: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { playSfx } = useAudio();
 
+  const wordmark = (
+    <div className="flex items-center gap-3">
+      <span className="font-arcade text-lg text-primary">{content.nav.wordmark}</span>
+      <span className="border-[2px] border-border bg-surface/60 px-2 py-1 font-arcade text-[8px] uppercase text-muted">
+        {content.nav.uwTag}
+      </span>
+    </div>
+  );
+
+  if (props.variant === "dashboard") {
+    return (
+      <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian shrink-0">
+        <nav className="mx-auto flex max-w-full items-center justify-between px-6 py-4">
+          {wordmark}
+          <div className="flex items-center gap-3">
+            <span className="border-[2px] border-border bg-surface px-3 py-1 font-arcade text-[8px] text-muted">
+              {props.username}
+            </span>
+            <ArcadeButton
+              variant="neutral"
+              onClick={() => { playSfx("click"); props.onProfile(); }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              PROFILE
+            </ArcadeButton>
+            <ArcadeButton
+              variant="danger"
+              onClick={() => { playSfx("click"); props.onLogout(); }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              LOGOUT
+            </ArcadeButton>
+          </div>
+        </nav>
+      </header>
+    );
+  }
+
+  // Public variant
   return (
     <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <span className="font-arcade text-lg text-primary">{content.nav.wordmark}</span>
-            <span className="border-[2px] border-border bg-surface/60 px-2 py-1 font-arcade text-[8px] uppercase text-muted">
-              {content.nav.uwTag}
-            </span>
-          </div>
+          {wordmark}
         </div>
-
-
 
         {/* Desktop Controls */}
         <div className="hidden items-center gap-6 md:flex">
           <div className="mr-2">
             <AudioToggle />
           </div>
-
           <ArcadeButton
             variant="success"
-            onClick={() => { playSfx("click"); onSignIn(); }}
+            onClick={() => { playSfx("click"); props.onSignIn(); }}
             onMouseEnter={() => playSfx("hover")}
           >
             {content.nav.signIn}
           </ArcadeButton>
           <ArcadeButton
             variant="warning"
-            onClick={() => { playSfx("start"); onSignUp(); }}
+            onClick={() => { playSfx("start"); props.onSignUp(); }}
             onMouseEnter={() => playSfx("hover")}
           >
             {content.nav.signUp}
@@ -67,14 +97,15 @@ export function Navbar({ onSignIn, onSignUp }: NavbarProps) {
       </nav>
 
       <MobileMenu
+        variant="public"
         isOpen={mobileOpen}
         onClose={() => setMobileOpen(false)}
         links={[]}
-        onSignIn={onSignIn}
-        onSignUp={onSignUp}
+        onSignIn={props.onSignIn}
+        onSignUp={props.onSignUp}
         signInLabel={content.nav.signIn}
         signUpLabel={content.nav.signUp}
       />
-    </header >
+    </header>
   );
 }

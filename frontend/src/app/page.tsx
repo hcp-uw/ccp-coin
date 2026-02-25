@@ -57,7 +57,7 @@ export default function Page() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="page-shell flex h-screen flex-col overflow-hidden bg-obsidian relative">
-        <Navbar onSignIn={openSignIn} onSignUp={openSignUp} />
+        <Navbar variant="public" onSignIn={openSignIn} onSignUp={openSignUp} />
 
         {/* Main Attract Mode Screen */}
         <main className="flex-1 overflow-hidden relative mx-auto w-full max-w-[1400px] px-6 py-6 md:py-12 flex flex-col justify-center">
