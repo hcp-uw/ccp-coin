@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FiX } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { ArcadeButton } from "../../shared/ArcadeButton";
@@ -95,24 +95,24 @@ export function MobileMenu(props: MobileMenuProps) {
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
-            className="absolute right-0 top-0 h-full w-72 border-l border-border bg-obsidian p-6"
+            className="absolute right-0 top-0 h-full w-48 border-l border-border bg-obsidian p-4"
             initial={shouldReduceMotion ? { opacity: 1 } : { x: "100%" }}
             animate={shouldReduceMotion ? { opacity: 1 } : { x: 0 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { x: "100%" }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: "easeOut" }}
           >
-            <div className="mb-8 flex items-center justify-end">
+            <div className="mb-4 flex items-center justify-end">
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close menu"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted transition hover:text-text"
               >
-                <FiX size={20} />
+                <FiMenu size={20} />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-6">
+            <nav className="flex flex-col gap-3">
               {links.map((link) => (
                 <a
                   key={link.href}
