@@ -2,6 +2,7 @@
 
 import { Navbar } from "@/components/landing/nav/Navbar";
 import { useRouter } from "next/navigation";
+import { MOCK_USER } from "@/content/mockData";
 
 export default function DashboardLayout({
   children
@@ -23,6 +24,7 @@ export default function DashboardLayout({
       <Navbar
         variant="dashboard"
         username="ISAIAH"
+        stats={{ balance: MOCK_USER.balance, streak: MOCK_USER.streak, rank: MOCK_USER.rank, accuracy: MOCK_USER.accuracy }}
         onLogout={handleLogout}
         onProfile={handleProfile}
       />
