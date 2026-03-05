@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { MotionConfig } from "framer-motion";
-import { DashboardStatBar } from "@/components/dashboard/DashboardStatBar";
 import { DashboardWatchlist } from "@/components/dashboard/DashboardWatchlist";
 import { DailyMissionStrip } from "@/components/dashboard/DailyMissionStrip";
 import { TrendingTickerTape } from "@/components/dashboard/TrendingTickerTape";
@@ -11,6 +10,7 @@ import { SlipDrawer } from "@/components/dashboard/SlipDrawer";
 import { SocialPanel } from "@/components/dashboard/SocialPanel";
 import { MobileBottomNav } from "@/components/dashboard/MobileBottomNav";
 import { SlipProvider, useSlip } from "@/hooks/useSlip";
+import { ScrollWithProgress } from "@/components/shared/ScrollWithProgress";
 import {
   MOCK_USER,
   MOCK_WATCHLIST_TICKERS,
@@ -20,6 +20,7 @@ import {
   MOCK_HEAD_TO_HEAD,
 } from "@/content/mockData";
 import type { SlipDirection } from "@/types/slip";
+
 
 export default function DashboardPage() {
   const [mobileView, setMobileView] = useState<"picks" | "watchlist" | "social">("picks");
@@ -60,17 +61,25 @@ function DashboardContent({
     console.log("Placing bet:", picks);
   };
 
+  const scrollPb =
+    picks.length === 0
+      ? "pb-28"
+      : picks.length <= 2
+      ? "pb-32"
+      : "pb-44";
+
   const renderCenterContent = () => (
-    <section className="flex flex-col overflow-y-auto h-full pb-40">
-      <DashboardStatBar user={MOCK_USER} />
+    <section className="flex flex-col h-full">
       <DailyMissionStrip current={3} total={5} label="Place 5 predictions today" />
       <TrendingTickerTape items={MOCK_TRENDING_PICKS} />
-      <ProjectionTileGrid
-        picks={MOCK_TRENDING_PICKS}
-        selectedPicks={picks}
-        onSelect={handleSelectPick}
-        onDeselect={handleRemovePick}
-      />
+      <ScrollWithProgress className={scrollPb}>
+        <ProjectionTileGrid
+          picks={MOCK_TRENDING_PICKS}
+          selectedPicks={picks}
+          onSelect={handleSelectPick}
+          onDeselect={handleRemovePick}
+        />
+      </ScrollWithProgress>
     </section>
   );
 
@@ -89,38 +98,34 @@ function DashboardContent({
 
   return (
     <MotionConfig reducedMotion="user">
-      <main className="h-full grid grid-cols-1 lg:grid-cols-[260px_1fr_280px] overflow-hidden">
-        <div className="hidden lg:flex h-full">
+      <main className="h-full grid grid-cols-1 lg:grid-cols-[260px_1fr_280px]">
+        <div className="hidden lg:block h-full">
           {renderWatchlist()}
         </div>
 
         <div className="flex flex-col h-full overflow-hidden">
           {mobileView === "watchlist" && (
-            <div className="flex-1 overflow-hidden lg:hidden">
+            <div className="flex-1 min-h-0 overflow-y-auto lg:hidden">
               {renderWatchlist()}
             </div>
           )}
           {mobileView === "social" && (
-            <div className="flex-1 overflow-hidden lg:hidden">
+            <div className="flex-1 min-h-0 lg:hidden">
               {renderSocial()}
             </div>
           )}
           {mobileView === "picks" && (
-            <div className="flex-1 overflow-hidden">
+            <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
               {renderCenterContent()}
             </div>
           )}
         </div>
 
-        <div className="hidden lg:flex h-full">
+        <div className="hidden lg:block h-full">
           {renderSocial()}
         </div>
       </main>
       
-      <div className="lg:hidden">
-        {mobileView === "picks" && renderCenterContent()}
-      </div>
-
       <SlipDrawer
         picks={picks}
         onRemovePick={handleRemovePick}
