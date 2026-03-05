@@ -24,7 +24,7 @@ export function HeadToHeadCard({ headToHead }: HeadToHeadCardProps) {
       : "TIED";
 
   return (
-    <div className="border-[2px] border-secondary bg-obsidian shadow-[4px_4px_0px_0px_rgba(184,41,255,0.4)] p-4 m-4">
+    <div className="border-[2px] border-secondary bg-obsidian shadow-[4px_4px_0px_0px_rgba(184,41,255,0.4)] p-4 mt-3">
       <div className="flex items-center justify-between mb-4">
         <span className="font-arcade text-[8px] text-secondary">HEAD TO HEAD</span>
         <span className={`font-arcade text-[8px] ${statusClass}`}>{statusText}</span>

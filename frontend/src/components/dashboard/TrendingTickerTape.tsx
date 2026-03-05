@@ -4,18 +4,18 @@ import type { TrendingPick } from "@/content/mockData";
 
 export function TrendingTickerTape({ items }: { items: TrendingPick[] }) {
   return (
-    <div className="border-y-[2px] border-border bg-surface/50 py-2 overflow-hidden relative mx-4 mt-4">
+    <div className="border-y-[2px] border-border bg-surface/50 py-2 overflow-hidden relative">
       <style>{`
         @keyframes ticker-scroll {
           from { transform: translateX(0); }
           to { transform: translateX(-50%); }
         }
       `}</style>
-      <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center font-arcade text-[8px] text-primary bg-surface px-3 border-r-[2px] border-border">
+      <div className="absolute left-0 top-0 bottom-0 z-10 flex items-center font-arcade text-[8px] text-primary bg-surface px-2 md:px-3 border-r-[2px] border-border">
         TRENDING NOW
       </div>
       <div
-        className="flex gap-8 pl-36 pointer-events-none"
+        className="flex gap-8 pl-20 md:pl-36 pointer-events-none"
         style={{ animation: "ticker-scroll 30s linear infinite" }}
       >
         {[...items, ...items].map((item, i) => (

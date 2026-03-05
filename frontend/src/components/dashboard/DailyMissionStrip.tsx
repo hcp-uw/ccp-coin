@@ -12,10 +12,10 @@ export function DailyMissionStrip({ current, total, label }: DailyMissionStripPr
 
   return (
     <div
-      className={`flex items-center gap-4 mx-4 mt-4 px-6 py-3 border-[2px] ${
+      className={`flex items-center gap-4 px-6 h-12 shrink-0 border-b-[2px] ${
         isComplete
-          ? "border-up bg-up/5 shadow-[4px_4px_0px_0px_rgba(0,255,65,0.2)]"
-          : "border-xp bg-xp/5 shadow-[4px_4px_0px_0px_rgba(255,215,0,0.2)]"
+          ? "border-up bg-up/5"
+          : "border-xp bg-xp/5"
       }`}
     >
       <span className={`font-arcade text-[8px] shrink-0 ${isComplete ? "text-up" : "text-xp"}`}>

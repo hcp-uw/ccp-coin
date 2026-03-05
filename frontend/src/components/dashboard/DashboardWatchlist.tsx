@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Sparkline } from "@/components/shared/Sparkline";
-import { ArcadeButton } from "@/components/shared/ArcadeButton";
 import type { WatchlistTicker } from "@/content/mockData";
 
 export function DashboardWatchlist({ tickers }: { tickers: WatchlistTicker[] }) {
@@ -12,11 +11,9 @@ export function DashboardWatchlist({ tickers }: { tickers: WatchlistTicker[] }) 
   return (
     <div className="flex flex-col h-full border-r-[2px] border-border bg-obsidian overflow-hidden">
       {/* Header */}
-      <div className="flex items-center justify-between border-b-[2px] border-border px-4 py-3 shrink-0">
-        <span className="font-arcade text-[8px] text-muted">[ WATCHLIST ]</span>
-        <ArcadeButton variant="primary" className="text-[8px] px-2 py-1">
-          + ADD
-        </ArcadeButton>
+      <div className="flex items-center gap-2 border-b-[2px] border-border px-4 h-12 shrink-0">
+        <span className="border-[2px] border-border bg-surface/60 px-2 py-1 font-arcade text-[8px] uppercase text-muted"> WATCHLIST </span>
+        <span className="border-[2px] border-primary bg-surface/60 px-2 py-1 font-arcade text-[8px] uppercase text-primary cursor-pointer hover:bg-primary/10 transition-colors">+ ADD</span>
       </div>
 
       {/* Rows */}

@@ -23,7 +23,7 @@ export function MobileBottomNav({ activeView, onViewChange }: MobileBottomNavPro
           <button
             key={tab.id}
             onClick={() => onViewChange(tab.id)}
-            className={`py-3 font-arcade text-[8px] transition-colors ${
+            className={`py-3 min-h-[44px] font-arcade text-[8px] transition-colors ${
               activeView === tab.id
                 ? "text-primary bg-primary/5"
                 : "text-muted hover:text-text"

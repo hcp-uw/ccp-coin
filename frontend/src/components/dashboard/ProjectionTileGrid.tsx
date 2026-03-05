@@ -37,11 +37,11 @@ export function ProjectionTile({ pick, isSelected, selectedDirection, onSelect, 
   return (
     <div className={`p-4 ${borderClass}`}>
       <div className="text-center mb-3">
-        <span className="font-arcade text-lg text-text">{pick.symbol}</span>
+        <span className="font-arcade text-sm text-text">{pick.symbol}</span>
       </div>
-      
+
       <div className="text-center mb-3">
-        <span className="font-arcade text-2xl text-text">{pick.price}</span>
+        <span className="font-arcade text-xl text-text">{pick.price}</span>
       </div>
 
       <div className="space-y-2 mb-4">
@@ -74,20 +74,20 @@ export function ProjectionTile({ pick, isSelected, selectedDirection, onSelect, 
 
       <div className="flex gap-2">
         {isSelected && selectedDirection === "MORE" ? (
-          <ArcadeButton variant="success" onClick={handleDeselect} className="flex-1 text-[8px]">
+          <ArcadeButton variant="success" onClick={handleDeselect} className="flex-1 text-[8px] py-1">
             MORE ✓
           </ArcadeButton>
         ) : (
-          <ArcadeButton variant="success" onClick={handleMore} className="flex-1 text-[8px]" role="radio" aria-checked={selectedDirection === "MORE"}>
+          <ArcadeButton variant="success" onClick={handleMore} className="flex-1 text-[8px] py-1" role="radio" aria-checked={selectedDirection === "MORE"}>
             MORE
           </ArcadeButton>
         )}
         {isSelected && selectedDirection === "LESS" ? (
-          <ArcadeButton variant="danger" onClick={handleDeselect} className="flex-1 text-[8px]">
+          <ArcadeButton variant="danger" onClick={handleDeselect} className="flex-1 text-[8px] py-1">
             LESS ✓
           </ArcadeButton>
         ) : (
-          <ArcadeButton variant="danger" onClick={handleLess} className="flex-1 text-[8px]" role="radio" aria-checked={selectedDirection === "LESS"}>
+          <ArcadeButton variant="danger" onClick={handleLess} className="flex-1 text-[8px] py-1" role="radio" aria-checked={selectedDirection === "LESS"}>
             LESS
           </ArcadeButton>
         )}
@@ -107,7 +107,7 @@ export function ProjectionTileGrid({ picks, selectedPicks, onSelect, onDeselect 
   const selectedMap = new Map(selectedPicks.map(p => [p.symbol, p.direction]));
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 p-4">
+    <div className="grid grid-cols-2 md:grid-cols-3 gap-4 px-6 py-4">
       {picks.map((pick) => {
         const isSelected = selectedMap.has(pick.symbol);
         const selectedDirection = selectedMap.get(pick.symbol) ?? null;
