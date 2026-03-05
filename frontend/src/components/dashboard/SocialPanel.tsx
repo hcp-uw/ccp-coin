@@ -29,16 +29,16 @@ export function SocialPanel({ friends, activities, headToHead, currentUserRank }
     .sort((a, b) => a.rank - b.rank);
 
   return (
-    <div className="flex flex-col h-full border-l-[2px] border-border bg-obsidian overflow-hidden">
-      <div className="grid grid-cols-2 border-b-[2px] border-border shrink-0">
+    <div className="flex flex-col h-full lg:border-l-[2px] border-border bg-obsidian overflow-hidden">
+      <div className="grid grid-cols-2 shrink-0 h-12">
         <button
           role="tab"
           aria-selected={activeTab === "friends"}
           onClick={() => setActiveTab("friends")}
-          className={`py-3 font-arcade text-[8px] transition-colors ${
+          className={`h-full font-arcade text-[8px] transition-colors border-b-[2px] ${
             activeTab === "friends"
-              ? "text-primary border-b-[2px] border-primary bg-primary/5"
-              : "text-muted hover:text-text"
+              ? "text-primary border-primary bg-primary/5"
+              : "text-muted border-border hover:text-text"
           }`}
         >
           FRIENDS
@@ -47,20 +47,24 @@ export function SocialPanel({ friends, activities, headToHead, currentUserRank }
           role="tab"
           aria-selected={activeTab === "feed"}
           onClick={() => setActiveTab("feed")}
-          className={`py-3 font-arcade text-[8px] transition-colors ${
+          className={`h-full font-arcade text-[8px] transition-colors border-b-[2px] ${
             activeTab === "feed"
-              ? "text-primary border-b-[2px] border-primary bg-primary/5"
-              : "text-muted hover:text-text"
+              ? "text-primary border-primary bg-primary/5"
+              : "text-muted border-border hover:text-text"
           }`}
         >
           FEED
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {activeTab === "friends" ? (
-          <div className="p-2">
-            <LeaderboardSection data={leaderboardRows} highlightRank={currentUserRank} />
+          <div className="px-3 py-2 pb-28 lg:pb-4">
+            <div className="flex items-center gap-2 mb-3 border-[2px] border-border bg-obsidian px-3 py-2 font-arcade text-[8px] text-muted w-full tracking-widest">
+              <span className="text-up">↗</span>
+              LIVE DATA FEED
+            </div>
+            <LeaderboardSection data={leaderboardRows} highlightRank={currentUserRank} compact />
             <HeadToHeadCard headToHead={headToHead} />
           </div>
         ) : (
