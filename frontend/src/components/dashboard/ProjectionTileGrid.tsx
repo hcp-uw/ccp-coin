@@ -72,22 +72,42 @@ export function ProjectionTile({ pick, isSelected, selectedDirection, onSelect, 
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2" aria-label={`${pick.symbol} direction`} role="group">
         {isSelected && selectedDirection === "MORE" ? (
-          <ArcadeButton variant="success" onClick={handleDeselect} className="flex-1 text-[8px] py-1">
+          <ArcadeButton
+            variant="success"
+            onClick={handleDeselect}
+            className="flex-1 text-[8px] py-1"
+            aria-pressed={true}
+          >
             MORE ✓
           </ArcadeButton>
         ) : (
-          <ArcadeButton variant="success" onClick={handleMore} className="flex-1 text-[8px] py-1" role="radio" aria-checked={selectedDirection === "MORE"}>
+          <ArcadeButton
+            variant="success"
+            onClick={handleMore}
+            className="flex-1 text-[8px] py-1"
+            aria-pressed={selectedDirection === "MORE"}
+          >
             MORE
           </ArcadeButton>
         )}
         {isSelected && selectedDirection === "LESS" ? (
-          <ArcadeButton variant="danger" onClick={handleDeselect} className="flex-1 text-[8px] py-1">
+          <ArcadeButton
+            variant="danger"
+            onClick={handleDeselect}
+            className="flex-1 text-[8px] py-1"
+            aria-pressed={true}
+          >
             LESS ✓
           </ArcadeButton>
         ) : (
-          <ArcadeButton variant="danger" onClick={handleLess} className="flex-1 text-[8px] py-1" role="radio" aria-checked={selectedDirection === "LESS"}>
+          <ArcadeButton
+            variant="danger"
+            onClick={handleLess}
+            className="flex-1 text-[8px] py-1"
+            aria-pressed={selectedDirection === "LESS"}
+          >
             LESS
           </ArcadeButton>
         )}

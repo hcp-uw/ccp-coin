@@ -10,6 +10,7 @@ const defaultProps = {
     { label: "How it works", href: "#how" },
     { label: "Features", href: "#features" },
   ],
+  variant: "public" as const,
   onSignIn: vi.fn(),
   onSignUp: vi.fn(),
   signInLabel: "Sign in",

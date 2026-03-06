@@ -1,3 +1,6 @@
+import type { Friend, ActivityItem, HeadToHead } from "@/types/friend";
+import type { User } from "@/types/user";
+
 export type Ticker = {
   symbol: string;
   name: string;
@@ -45,9 +48,6 @@ export type TrendingPick = {
   aiDirection: "MORE" | "LESS";
   sparkline: number[];
 };
-
-import type { User } from "@/types/user";
-import type { Friend, ActivityItem, HeadToHead } from "@/types/friend";
 
 export const tickers: Ticker[] = [
   {

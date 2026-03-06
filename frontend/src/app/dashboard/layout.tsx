@@ -23,7 +23,7 @@ export default function DashboardLayout({
     <div className="flex flex-col h-screen overflow-hidden">
       <Navbar
         variant="dashboard"
-        username="ISAIAH"
+        username={MOCK_USER.username}
         stats={{ balance: MOCK_USER.balance, streak: MOCK_USER.streak, rank: MOCK_USER.rank, accuracy: MOCK_USER.accuracy }}
         onLogout={handleLogout}
         onProfile={handleProfile}

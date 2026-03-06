@@ -17,7 +17,7 @@ describe("Navbar", () => {
     const user = userEvent.setup();
     const onSignIn = vi.fn();
     const onSignUp = vi.fn();
-    render(<Navbar onSignIn={onSignIn} onSignUp={onSignUp} />);
+    render(<Navbar variant="public" onSignIn={onSignIn} onSignUp={onSignUp} />);
     return { user, onSignIn, onSignUp };
   };
 

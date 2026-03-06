@@ -1,7 +1,7 @@
 "use client";
 
 import { createContext, useContext, useReducer, type ReactNode } from "react";
-import type { SlipPick, SlipDirection } from "@/types/slip";
+import type { SlipPick } from "@/types/slip";
 
 type SlipState = {
   picks: SlipPick[];

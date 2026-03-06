@@ -12,7 +12,7 @@ const colorMap = {
 };
 
 export function Sparkline({ points, symbol, color = "primary", className }: SparklineProps) {
-  if (points.length === 0) return null;
+  if (points.length < 2) return null;
 
   const max = Math.max(...points);
   const min = Math.min(...points);

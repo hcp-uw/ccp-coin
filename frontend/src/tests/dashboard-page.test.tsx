@@ -10,7 +10,7 @@ function setup() {
 }
 
 function getTileByIndex(index: number) {
-  const moreButtons = screen.getAllByRole("radio", { name: /^more$/i });
+  const moreButtons = screen.getAllByRole("button", { name: /^more$/i });
   const tile = moreButtons[index]?.closest(".p-4");
   expect(tile).toBeInTheDocument();
   return tile as HTMLElement;
@@ -39,7 +39,7 @@ describe("DashboardPage", () => {
     expect(screen.getByText(/your slip.*empty/i)).toBeInTheDocument();
 
     const aaplTile = getTileByIndex(0);
-    await user.click(within(aaplTile).getByRole("radio", { name: /^more$/i }));
+    await user.click(within(aaplTile).getByRole("button", { name: /^more$/i }));
 
     expect(screen.getByRole("button", { name: /aapl more 100 dc/i })).toBeInTheDocument();
 
@@ -52,7 +52,7 @@ describe("DashboardPage", () => {
 
     for (const index of [0, 1, 2]) {
       const tile = getTileByIndex(index);
-      await user.click(within(tile).getByRole("radio", { name: /^more$/i }));
+      await user.click(within(tile).getByRole("button", { name: /^more$/i }));
     }
 
     expect(screen.getByText(/payout:/i)).toBeInTheDocument();
@@ -64,7 +64,7 @@ describe("DashboardPage", () => {
 
     for (const index of [0, 1]) {
       const tile = getTileByIndex(index);
-      await user.click(within(tile).getByRole("radio", { name: /^less$/i }));
+      await user.click(within(tile).getByRole("button", { name: /^less$/i }));
     }
 
     expect(screen.getByRole("button", { name: /aapl less 100 dc/i })).toBeInTheDocument();
