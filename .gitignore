@@ -6,3 +6,5 @@ frontend/.next/
 frontend/test-results/
 frontend/playwright-report/
 frontend/playwright/.cache/
+frontend/tsconfig.tsbuildinfo
+thoughts/

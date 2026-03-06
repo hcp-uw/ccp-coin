@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { MotionConfig } from "framer-motion";
 import { Navbar } from "@/components/landing/nav/Navbar";
@@ -15,6 +16,12 @@ import { useEscapeKey } from "@/hooks/useEscapeKey";
 export default function Page() {
   const [activeModal, setActiveModal] = useState<"signin" | "signup" | "how" | "faq" | "leaderboard" | null>(null);
   const { playSfx } = useAudio();
+  const router = useRouter();
+
+  const handleAuth = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push("/dashboard");
+  };
 
   const openSignIn = () => setActiveModal("signin");
   const openSignUp = () => setActiveModal("signup");
@@ -57,7 +64,7 @@ export default function Page() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="page-shell flex h-screen flex-col overflow-hidden bg-obsidian relative">
-        <Navbar onSignIn={openSignIn} onSignUp={openSignUp} />
+        <Navbar variant="public" onSignIn={openSignIn} onSignUp={openSignUp} />
 
         {/* Main Attract Mode Screen */}
         <main className="flex-1 overflow-hidden relative mx-auto w-full max-w-[1400px] px-6 py-6 md:py-12 flex flex-col justify-center">
@@ -79,7 +86,7 @@ export default function Page() {
 
         {/* --- Modals --- */}
         <RetroModal title="SIGN IN" isOpen={activeModal === "signin"}>
-          <form className="mx-auto w-full max-w-md space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <form className="mx-auto w-full max-w-md space-y-6" onSubmit={handleAuth}>
             <label className="block font-arcade text-[10px] uppercase text-primary">
               UW Email
               <input
@@ -106,7 +113,7 @@ export default function Page() {
         </RetroModal>
 
         <RetroModal title="NEW CHALLENGER (SIGN UP)" isOpen={activeModal === "signup"}>
-          <form className="mx-auto w-full max-w-md space-y-6" onSubmit={(e) => e.preventDefault()}>
+          <form className="mx-auto w-full max-w-md space-y-6" onSubmit={handleAuth}>
             <label className="block font-arcade text-[10px] uppercase text-primary">
               UW Email
               <input
