@@ -8,3 +8,4 @@ frontend/playwright-report/
 frontend/playwright/.cache/
 frontend/tsconfig.tsbuildinfo
 thoughts/
+frontend/.env.local
