@@ -34,6 +34,7 @@ type MobileMenuProps =
       variant: "dashboard";
       onLogout: () => void;
       onProfile: () => void;
+      onHome?: () => void;
       username: string;
     };
 
@@ -128,6 +129,14 @@ export function MobileMenu(props: MobileMenuProps) {
 
               {props.variant === "dashboard" ? (
                 <>
+                  {props.onHome && (
+                    <ArcadeButton
+                      variant="success"
+                      onClick={() => { onClose(); props.onHome!(); }}
+                    >
+                      DASHBOARD
+                    </ArcadeButton>
+                  )}
                   <ArcadeButton
                     variant="neutral"
                     onClick={() => { onClose(); props.onProfile(); }}

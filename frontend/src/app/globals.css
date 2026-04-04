@@ -89,8 +89,7 @@ body {
 }
 
 ::selection {
-  background: rgba(0, 240, 255, 0.35);
-  /* primary */
+  background: rgb(var(--color-primary) / 0.35);
 }
 
 /* Overriding old soft elements */
@@ -104,13 +103,40 @@ body {
 .surface-card {
   background-color: rgb(var(--color-obsidian));
   border: 2px solid rgb(var(--color-primary));
-  box-shadow: 4px 4px 0px 0px rgba(0, 240, 255, 0.4);
+  box-shadow: 4px 4px 0px 0px rgb(var(--color-primary) / 0.4);
+  border-radius: var(--radius-lg);
+}
+
+.surface-card--profile {
+  background-color: rgb(var(--color-surface));
+  border: 2px solid rgb(var(--color-xp));
+  box-shadow: 4px 4px 0px 0px rgb(var(--color-xp) / 0.18);
+  border-radius: var(--radius-lg);
+}
+
+.surface-card--profile-blue {
+  background-color: rgb(var(--color-surface));
+  border: 2px solid rgb(var(--color-primary));
+  box-shadow: 4px 4px 0px 0px rgb(var(--color-primary) / 0.18);
+  border-radius: var(--radius-lg);
+}
+
+.surface-card--profile-purple {
+  background-color: rgb(var(--color-surface));
+  border: 2px solid rgb(var(--color-secondary));
+  box-shadow: 4px 4px 0px 0px rgb(var(--color-secondary) / 0.18);
+  border-radius: var(--radius-lg);
+}
+
+.surface-card--profile-red {
+  background-color: rgb(var(--color-surface));
+  border: 2px solid rgb(var(--color-danger));
+  box-shadow: 4px 4px 0px 0px rgb(var(--color-danger) / 0.18);
   border-radius: var(--radius-lg);
 }
 
 .text-shadow-block {
-  text-shadow: 4px 4px 0px rgba(184, 41, 255, 0.5);
-  /* secondary color drop shadow */
+  text-shadow: 4px 4px 0px rgb(var(--color-secondary) / 0.5);
 }
 
 .sr-only {
