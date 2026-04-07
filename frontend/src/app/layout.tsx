@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, JetBrains_Mono } from "next/font/google";
 import { AudioProvider } from "@/components/AudioController";
+import { AppShell } from "@/components/landing/nav/AppShell";
 import "./globals.css";
 
 const arcadeFont = Press_Start_2P({
@@ -31,7 +32,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${arcadeFont.variable} ${monoFont.variable} font-mono bg-obsidian text-text crt-screen`}>
         <AudioProvider>
-          {children}
+          <AppShell>{children}</AppShell>
         </AudioProvider>
       </body>
     </html>

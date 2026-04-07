@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { content } from "@/content/content";
 import { MobileMenu } from "./MobileMenu";
 import { AudioToggle, useAudio } from "@/components/AudioController";
@@ -20,6 +22,7 @@ type NavbarProps =
 
 export function Navbar(props: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const pathname = usePathname();
   const { playSfx } = useAudio();
 
   const wordmark = (
@@ -30,6 +33,9 @@ export function Navbar(props: NavbarProps) {
       </span>
     </div>
   );
+
+  const navLinkClass = (href: string) =>
+    `font-arcade text-[9px] uppercase tracking-[0.2em] transition ${pathname === href ? "text-xp" : "text-muted hover:text-text"}`;
 
   if (props.variant === "dashboard") {
     const streakBorderClass = props.stats
@@ -96,6 +102,13 @@ export function Navbar(props: NavbarProps) {
               PROFILE
             </ArcadeButton>
             <ArcadeButton
+              variant="warning"
+              onClick={() => { playSfx("click"); window.location.href = "/leaderboard"; }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              LEADERBOARD
+            </ArcadeButton>
+            <ArcadeButton
               variant="danger"
               onClick={() => { playSfx("click"); props.onLogout(); }}
               onMouseEnter={() => playSfx("hover")}
@@ -125,9 +138,16 @@ export function Navbar(props: NavbarProps) {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-6">
           {wordmark}
+          <div className="hidden items-center gap-4 lg:flex">
+            <Link href="/dashboard" className={navLinkClass("/dashboard")}>
+              Dashboard
+            </Link>
+            <Link href="/leaderboard" className={navLinkClass("/leaderboard")}>
+              Leaderboard
+            </Link>
+          </div>
         </div>
 
-        {/* Desktop Controls */}
         <div className="hidden items-center gap-6 md:flex">
           <div className="mr-2">
             <AudioToggle />
@@ -148,7 +168,6 @@ export function Navbar(props: NavbarProps) {
           </ArcadeButton>
         </div>
 
-        {/* Mobile controls */}
         <div className="flex items-center gap-4 md:hidden">
           <AudioToggle />
           <button
