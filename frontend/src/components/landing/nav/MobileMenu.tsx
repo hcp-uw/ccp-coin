@@ -83,7 +83,7 @@ export function MobileMenu(props: MobileMenuProps) {
     <AnimatePresence>
       {isOpen ? (
         <motion.div
-          className="fixed inset-0 z-50 bg-obsidian/60 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-50 bg-obsidian/60 backdrop-blur-sm lg:hidden"
           initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0 }}
@@ -133,6 +133,12 @@ export function MobileMenu(props: MobileMenuProps) {
                     onClick={() => { onClose(); props.onProfile(); }}
                   >
                     PROFILE
+                  </ArcadeButton>
+                  <ArcadeButton
+                    variant="warning"
+                    onClick={() => { onClose(); window.location.href = "/leaderboard"; }}
+                  >
+                    LEADERBOARD
                   </ArcadeButton>
                   <ArcadeButton
                     variant="danger"

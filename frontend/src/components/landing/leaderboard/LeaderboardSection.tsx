@@ -1,11 +1,18 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { FiTrendingUp } from "react-icons/fi";
+import { FiSearch, FiTrendingUp } from "react-icons/fi";
 import { leaderboard, type LeaderboardRow } from "@/content/mockData";
 
 export function LeaderboardSection({ data, highlightRank, compact }: { data?: LeaderboardRow[]; highlightRank?: number; compact?: boolean } = {}) {
+  const [query, setQuery] = useState("");
   const rows = data ?? leaderboard;
+  const filteredRows = useMemo(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return rows;
+    return rows.filter((row) => row.name.toLowerCase().includes(normalized) || String(row.rank).includes(normalized));
+  }, [query, rows]);
 
   if (compact) {
     return (
@@ -15,7 +22,7 @@ export function LeaderboardSection({ data, highlightRank, compact }: { data?: Le
           <span>PLAYER</span>
         </div>
         <div className="divide-y-[2px] divide-border">
-          {rows.map((row) => (
+          {filteredRows.map((row) => (
             <div
               key={row.rank}
               className={`grid grid-cols-[40px_1fr] items-center gap-3 px-3 py-2 ${row.rank === highlightRank ? "bg-primary/5 border-l-[2px] border-primary" : ""}`}
@@ -31,9 +38,21 @@ export function LeaderboardSection({ data, highlightRank, compact }: { data?: Le
 
   return (
     <div id="leaderboard" className="w-full">
-      <div className="flex items-center gap-2 mb-4 border-[2px] border-border bg-obsidian px-4 py-2 font-arcade text-[8px] text-muted w-fit tracking-widest">
-        <FiTrendingUp className="text-up" />
-        LIVE DATA FEED
+      <div className="flex flex-col gap-3 mb-4">
+        <div className="flex items-center gap-2 border-[2px] border-border bg-obsidian px-4 py-2 font-arcade text-[8px] text-muted w-fit tracking-widest">
+          <FiTrendingUp className="text-up" />
+          LIVE DATA FEED
+        </div>
+        <label className="flex items-center gap-2 border-[2px] border-border bg-surface/60 px-4 py-3 text-muted focus-within:border-xp">
+          <FiSearch className="shrink-0 text-xp" />
+          <input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Search players"
+            className="w-full bg-transparent font-mono text-sm text-text outline-none placeholder:text-muted"
+          />
+        </label>
       </div>
 
       <div className="mt-4 overflow-x-auto" data-testid="leaderboard">
@@ -48,7 +67,7 @@ export function LeaderboardSection({ data, highlightRank, compact }: { data?: Le
 
           {/* Table rows */}
           <div className="divide-y-[2px] divide-border bg-obsidian">
-            {rows.map((row) => (
+            {filteredRows.map((row) => (
               <motion.div
                 key={row.rank}
                 whileHover={{ backgroundColor: "rgba(255,255,255,0.05)", x: 4 }}
