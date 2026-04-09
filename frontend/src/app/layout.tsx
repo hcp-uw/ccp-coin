@@ -1,16 +1,19 @@
 import type { Metadata } from "next";
-import { Manrope, Space_Grotesk } from "next/font/google";
+import { Press_Start_2P, JetBrains_Mono } from "next/font/google";
+import { AudioProvider } from "@/components/AudioController";
+import { AppShell } from "@/components/landing/nav/AppShell";
 import "./globals.css";
 
-const bodyFont = Manrope({
+const arcadeFont = Press_Start_2P({
+  weight: "400",
   subsets: ["latin"],
-  variable: "--font-body",
+  variable: "--font-arcade",
   display: "swap"
 });
 
-const displayFont = Space_Grotesk({
+const monoFont = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-display",
+  variable: "--font-mono",
   display: "swap"
 });
 
@@ -27,8 +30,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={`${bodyFont.variable} ${displayFont.variable} font-sans bg-obsidian text-text`}>
-        {children}
+      <body className={`${arcadeFont.variable} ${monoFont.variable} font-mono bg-obsidian text-text crt-screen`}>
+        <AudioProvider>
+          <AppShell>{children}</AppShell>
+        </AudioProvider>
       </body>
     </html>
   );

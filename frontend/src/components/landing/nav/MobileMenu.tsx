@@ -2,10 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FiX } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
-import { GoldThread } from "@/components/shared/GoldThread";
+import { ArcadeButton } from "../../shared/ArcadeButton";
 
 const focusableSelector = [
   "a[href]",
@@ -16,25 +16,29 @@ const focusableSelector = [
   "[tabindex]:not([tabindex='-1'])",
 ].join(",");
 
-type MobileMenuProps = {
-  isOpen: boolean;
-  onClose: () => void;
-  links: { label: string; href: string }[];
-  onSignIn: () => void;
-  onSignUp: () => void;
-  signInLabel: string;
-  signUpLabel: string;
-};
+type MobileMenuProps =
+  | {
+      isOpen: boolean;
+      onClose: () => void;
+      links: { label: string; href: string }[];
+      variant: "public";
+      onSignIn: () => void;
+      onSignUp: () => void;
+      signInLabel: string;
+      signUpLabel: string;
+    }
+  | {
+      isOpen: boolean;
+      onClose: () => void;
+      links: { label: string; href: string }[];
+      variant: "dashboard";
+      onLogout: () => void;
+      onProfile: () => void;
+      username: string;
+    };
 
-export function MobileMenu({
-  isOpen,
-  onClose,
-  links,
-  onSignIn,
-  onSignUp,
-  signInLabel,
-  signUpLabel,
-}: MobileMenuProps) {
+export function MobileMenu(props: MobileMenuProps) {
+  const { isOpen, onClose, links } = props;
   const shouldReduceMotion = useReducedMotion();
   const panelRef = useRef<HTMLDivElement>(null);
   const lastActiveRef = useRef<HTMLElement | null>(null);
@@ -47,18 +51,14 @@ export function MobileMenu({
 
     lastActiveRef.current = document.activeElement as HTMLElement | null;
 
-    // Focus the first focusable element inside the panel
     const panel = panelRef.current;
     const focusables = panel?.querySelectorAll<HTMLElement>(focusableSelector);
     focusables?.[0]?.focus();
 
-    // Focus trap
     const handleKey = (event: KeyboardEvent) => {
       if (event.key !== "Tab" || !focusables || focusables.length === 0) return;
-
       const first = focusables[0];
       const last = focusables[focusables.length - 1];
-
       if (event.shiftKey && document.activeElement === first) {
         event.preventDefault();
         last?.focus();
@@ -83,7 +83,7 @@ export function MobileMenu({
     <AnimatePresence>
       {isOpen ? (
         <motion.div
-          className="fixed inset-0 z-50 bg-obsidian/60 backdrop-blur-sm md:hidden"
+          className="fixed inset-0 z-50 bg-obsidian/60 backdrop-blur-sm lg:hidden"
           initial={shouldReduceMotion ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={shouldReduceMotion ? { opacity: 0 } : { opacity: 0 }}
@@ -95,24 +95,24 @@ export function MobileMenu({
             role="dialog"
             aria-modal="true"
             aria-label="Mobile navigation"
-            className="absolute right-0 top-0 h-full w-72 border-l border-border bg-obsidian p-6"
+            className="absolute right-0 top-0 h-full w-48 border-l border-border bg-obsidian p-4"
             initial={shouldReduceMotion ? { opacity: 1 } : { x: "100%" }}
             animate={shouldReduceMotion ? { opacity: 1 } : { x: 0 }}
             exit={shouldReduceMotion ? { opacity: 0 } : { x: "100%" }}
             transition={{ duration: shouldReduceMotion ? 0 : 0.25, ease: "easeOut" }}
           >
-            <div className="mb-8 flex items-center justify-end">
+            <div className="mb-4 flex items-center justify-end">
               <button
                 type="button"
                 onClick={onClose}
                 aria-label="Close menu"
                 className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-muted transition hover:text-text"
               >
-                <FiX size={20} />
+                <FiMenu size={20} />
               </button>
             </div>
 
-            <nav className="flex flex-col gap-6">
+            <nav className="flex flex-col gap-3">
               {links.map((link) => (
                 <a
                   key={link.href}
@@ -124,28 +124,45 @@ export function MobileMenu({
                 </a>
               ))}
 
-              <GoldThread />
+              <div className="my-2 h-px bg-gradient-to-r from-transparent via-border to-transparent" />
 
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onSignIn();
-                }}
-                className="rounded-full border border-border bg-surface/70 px-4 py-2 text-sm uppercase tracking-[0.2em] text-muted transition hover:text-text"
-              >
-                {signInLabel}
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  onClose();
-                  onSignUp();
-                }}
-                className="rounded-full bg-gold/90 px-4 py-2 text-sm font-semibold uppercase tracking-[0.2em] text-obsidian transition hover:bg-gold"
-              >
-                {signUpLabel}
-              </button>
+              {props.variant === "dashboard" ? (
+                <>
+                  <ArcadeButton
+                    variant="neutral"
+                    onClick={() => { onClose(); props.onProfile(); }}
+                  >
+                    PROFILE
+                  </ArcadeButton>
+                  <ArcadeButton
+                    variant="warning"
+                    onClick={() => { onClose(); window.location.href = "/leaderboard"; }}
+                  >
+                    LEADERBOARD
+                  </ArcadeButton>
+                  <ArcadeButton
+                    variant="danger"
+                    onClick={() => { onClose(); props.onLogout(); }}
+                  >
+                    LOGOUT
+                  </ArcadeButton>
+                </>
+              ) : (
+                <>
+                  <ArcadeButton
+                    variant="success"
+                    onClick={() => { onClose(); props.onSignIn(); }}
+                  >
+                    {props.signInLabel}
+                  </ArcadeButton>
+                  <ArcadeButton
+                    variant="warning"
+                    onClick={() => { onClose(); props.onSignUp(); }}
+                  >
+                    {props.signUpLabel}
+                  </ArcadeButton>
+                </>
+              )}
             </nav>
           </motion.div>
         </motion.div>

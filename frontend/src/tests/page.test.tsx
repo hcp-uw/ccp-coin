@@ -1,9 +1,19 @@
 import { render, screen, within, waitFor } from "@testing-library/react";
+import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import Page from "@/app/page";
 import { aiInsights } from "@/content/mockData";
 
-describe("DubQuant landing page", () => {
+vi.mock("@/components/AudioController", () => ({
+  useAudio: () => ({
+    playSfx: vi.fn(),
+    isMuted: false,
+    toggleMute: vi.fn(),
+  }),
+  AudioToggle: () => <button>Toggle Sound</button>,
+}));
+
+describe("DubQuant Arcade Landing Page", () => {
   const setup = () => {
     const user = userEvent.setup();
     render(<Page />);
@@ -15,26 +25,27 @@ describe("DubQuant landing page", () => {
       const { user } = setup();
 
       // Find the first ticker's toggle group (e.g., AAPL)
-      const aaplRow = screen.getByText("AAPL").closest('.relative') as HTMLElement;
+      const aaplRow = screen.getByText("AAPL").closest(".relative");
       expect(aaplRow).toBeInTheDocument();
 
-      const upButton = within(aaplRow).getByRole("button", { name: /aapl up/i });
-      const downButton = within(aaplRow).getByRole("button", { name: /aapl down/i });
+      if (!aaplRow) return;
 
-      // Check initial state. The state is originally empty so neither is pressed.
-      expect(upButton).toHaveAttribute("aria-pressed", "false");
-      expect(downButton).toHaveAttribute("aria-pressed", "false");
-      expect(downButton).toHaveAttribute("aria-pressed", "false");
+      const upButton = within(aaplRow).getByRole("radio", { name: /up/i });
+      const downButton = within(aaplRow).getByRole("radio", { name: /dwn/i });
 
-      // Click Down
-      await user.click(downButton);
-      expect(downButton).toHaveAttribute("aria-pressed", "true");
-      expect(upButton).toHaveAttribute("aria-pressed", "false");
-
-      // Click Up again
+      // Click UP
       await user.click(upButton);
-      expect(upButton).toHaveAttribute("aria-pressed", "true");
-      expect(downButton).toHaveAttribute("aria-pressed", "false");
+      expect(upButton).toHaveClass("bg-up");
+      expect(upButton).toHaveAttribute("aria-checked", "true");
+      expect(downButton).not.toHaveClass("bg-down");
+      expect(downButton).toHaveAttribute("aria-checked", "false");
+
+      // Click DWN
+      await user.click(downButton);
+      expect(downButton).toHaveClass("bg-down");
+      expect(downButton).toHaveAttribute("aria-checked", "true");
+      expect(upButton).not.toHaveClass("bg-up");
+      expect(upButton).toHaveAttribute("aria-checked", "false");
     });
 
     it("displays correct AI insights including confidence scores", async () => {
@@ -43,81 +54,103 @@ describe("DubQuant landing page", () => {
       const insight = aiInsights[symbol];
 
       // Open AI Panel
-      const aiButton = screen.getByRole("button", { name: new RegExp(`open ai insight for ${symbol}`, "i") });
+      const aiButton = screen.getAllByRole("button", { name: /toggle ai insight/i })[0];
       await user.click(aiButton);
 
-      const panel = await screen.findByTestId("ai-panel");
-
       // Verify Header
-      expect(within(panel).getByText(symbol)).toBeInTheDocument();
-      expect(within(panel).getByText("AI Insight")).toBeInTheDocument();
+      expect(screen.getByText("AI SYSTEM")).toBeInTheDocument();
 
       // Verify Data Integrity
-      expect(within(panel).getByText(`${insight.confidence}%`)).toBeInTheDocument();
-      expect(within(panel).getByText(insight.suggestion)).toBeInTheDocument();
+      expect(screen.getByText(`${insight.confidence}%`)).toBeInTheDocument();
 
       // Verify Rationale
-      const rationaleList = within(panel).getByText("Analysis").nextElementSibling;
-      expect(rationaleList).toHaveTextContent(insight.rationale[0]);
+      expect(screen.getByText(new RegExp(insight.rationale[0], "i"))).toBeInTheDocument();
+    });
+
+    it("opens the retro stake dropdown and selects a new value", async () => {
+      const { user } = setup();
+
+      // Find the first default stake button
+      const stakeButton = screen.getAllByRole("button", { name: /stake:/i })[0];
+      expect(stakeButton).toHaveTextContent("50");
+
+      // Open dropdown
+      await user.click(stakeButton);
+
+      // Select 100
+      const option100 = await screen.findByRole("button", { name: /^100$/ });
+      await user.click(option100);
+
+      // Verify the chip updated
+      expect(stakeButton).toHaveTextContent("100");
     });
   });
 
-  describe("Modals", () => {
-    it("opens Sign In modal and displays correct form fields", async () => {
+  describe("Retro Modals", () => {
+    it("opens LOGIN modal and displays correct form fields", async () => {
       const { user } = setup();
 
       await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-      const modal = await screen.findByRole("dialog", { name: /sign in to dubquant/i });
+      const title = await screen.findByText("SIGN IN");
+      expect(title).toBeInTheDocument();
 
       // Verify form elements exist
-      expect(within(modal).getByLabelText(/uw email/i)).toBeInTheDocument();
-      expect(within(modal).getByLabelText(/password/i)).toBeInTheDocument();
-      expect(within(modal).getByRole("button", { name: /continue/i })).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/name@uw\.edu/i)).toBeInTheDocument();
+      expect(screen.getByPlaceholderText(/••••••••/i)).toBeInTheDocument();
+      expect(screen.getByRole("button", { name: /login/i })).toBeInTheDocument();
     });
 
-    it("opens Sign Up modal from Hero CTA", async () => {
+    it("opens JOIN THE ARENA modal from Hero CTA", async () => {
       const { user } = setup();
 
-      // Click the primary "Start learning" CTA in hero
-      const heroCta = screen.getByRole("button", { name: /start learning/i });
+      // Click the primary CTA
+      const heroCta = screen.getByRole("button", { name: /press start/i });
       await user.click(heroCta);
 
-      const modal = await screen.findByRole("dialog", { name: /sign up for dubquant/i });
-      expect(within(modal).getByLabelText(/expected grad year/i)).toBeInTheDocument();
-    });
+      // New title for Sign Up
+      const title = await screen.findByText("NEW CHALLENGER (SIGN UP)");
+      expect(title).toBeInTheDocument();
 
-    it("closes modal when clicking the close button", async () => {
-      const { user } = setup();
-
-      await user.click(screen.getByRole("button", { name: /sign in/i }));
-      const modal = await screen.findByRole("dialog");
-
-      const closeButton = within(modal).getByRole("button", { name: /close/i });
-      await user.click(closeButton);
-
-      await waitFor(() => {
-        expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      });
+      expect(screen.getByPlaceholderText(/2027/i)).toBeInTheDocument();
     });
   });
 
-  describe("Leaderboard", () => {
-    it("renders top students with correct rank styling", () => {
-      setup();
+  describe("Keyboard Interactions", () => {
+    it("closes modal when pressing the ESC key", async () => {
+      const { user } = setup();
 
-      const leaderboardSection = screen.getByTestId("leaderboard");
-      const topStudent = within(leaderboardSection).getByText("A. Park");
+      // Open a modal
+      await user.click(screen.getByRole("button", { name: /sign in/i }));
 
-      // Verify content is present
-      expect(topStudent).toBeInTheDocument();
+      // Verify it's open
+      expect(await screen.findByText("SIGN IN")).toBeInTheDocument();
 
-      // Verify ranking logic (visual check via class presence implies logic ran)
-      // Rank 1 has specific styling 'bg-gold/10'
-      // The text is inside a div, which is inside the row div.
-      // The row div has the class 'grid'.
-      const row = topStudent.closest('.grid');
-      expect(row).toHaveClass("bg-gold/10");
+      // Press ESC
+      await user.keyboard("{Escape}");
+
+      // Verify it's closed
+      await waitFor(() => {
+        expect(screen.queryByText("SIGN IN")).not.toBeInTheDocument();
+      });
+    });
+
+    it("closes AI Popover when pressing the ESC key", async () => {
+      const { user } = setup();
+
+      // Open AI Popover
+      const aiButton = screen.getAllByRole("button", { name: /toggle ai insight/i })[0];
+      await user.click(aiButton);
+
+      expect(screen.getByText("AI SYSTEM")).toBeInTheDocument();
+
+      // Press ESC
+      await user.keyboard("{Escape}");
+
+      // Verify it's closed
+      await waitFor(() => {
+        expect(screen.queryByText("AI SYSTEM")).not.toBeInTheDocument();
+      });
     });
   });
 });
