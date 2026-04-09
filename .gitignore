@@ -8,4 +8,6 @@ frontend/playwright-report/
 frontend/playwright/.cache/
 frontend/tsconfig.tsbuildinfo
 thoughts/
+.agents/
+.claude/
 frontend/.env.local

@@ -18,7 +18,7 @@ type DashboardStats = {
 
 type NavbarProps =
   | { variant: "public"; onSignIn: () => void; onSignUp: () => void }
-  | { variant: "dashboard"; username: string; stats?: DashboardStats; onLogout: () => void; onProfile: () => void };
+  | { variant: "dashboard"; username: string; stats?: DashboardStats; onLogout: () => void; onProfile: () => void; onHome?: () => void };
 
 export function Navbar(props: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -40,10 +40,10 @@ export function Navbar(props: NavbarProps) {
   if (props.variant === "dashboard") {
     const streakBorderClass = props.stats
       ? props.stats.streak >= 10
-        ? "border-secondary shadow-[4px_4px_0px_0px_rgba(184,41,255,0.4)]"
+        ? "border-secondary shadow-[4px_4px_0px_0px_rgb(var(--color-secondary)_/_0.4)]"
         : props.stats.streak >= 5
-          ? "border-xp shadow-[4px_4px_0px_0px_rgba(255,215,0,0.4)]"
-          : "border-border"
+        ? "border-xp shadow-[4px_4px_0px_0px_rgb(var(--color-xp)_/_0.4)]"
+        : "border-border"
       : "border-border";
 
     return (
@@ -85,6 +85,15 @@ export function Navbar(props: NavbarProps) {
             <span className="border-[2px] border-border bg-surface px-3 py-1 font-arcade text-[8px] text-muted">
               {props.username}
             </span>
+            {props.onHome && (
+              <ArcadeButton
+                variant="success"
+                onClick={() => { playSfx("click"); props.onHome!(); }}
+                onMouseEnter={() => playSfx("hover")}
+              >
+                DASHBOARD
+              </ArcadeButton>
+            )}
             <ArcadeButton
               variant="neutral"
               onClick={() => { playSfx("click"); props.onProfile(); }}
@@ -116,6 +125,7 @@ export function Navbar(props: NavbarProps) {
           links={[]}
           onLogout={props.onLogout}
           onProfile={props.onProfile}
+          onHome={props.onHome}
           username={props.username}
         />
       </header>
