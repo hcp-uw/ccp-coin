@@ -1,12 +1,17 @@
 """Tests for AI prediction endpoints in ai_routes.py."""
 
 import pytest
+from fastapi import FastAPI
 from fastapi.testclient import TestClient
-from ai_routes import app
+from ai_routes import router
+
+_app = FastAPI()
+_app.include_router(router)
+
 
 @pytest.fixture(scope="session")
 def ai_client():
-    return TestClient(app)
+    return TestClient(_app)
 
 
 class TestPredictionToday:
@@ -36,7 +41,6 @@ class TestPredictionToday:
     def test_confidence_range(self, ai_client):
         res = ai_client.get("/prediction/today")
         assert 0.0 <= res.json()["confidence"] <= 1.0
-
 
 
 class TestPredictionHistory:

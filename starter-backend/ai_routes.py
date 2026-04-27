@@ -1,28 +1,13 @@
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from fastapi import APIRouter
 from pydantic import BaseModel
 
-app = FastAPI()
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:3000"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+router = APIRouter()
 
 
 class PredictionResponse(BaseModel):
     stock: str
     prediction: str
     confidence: float
-
-
-class UserPredictionRequest(BaseModel):
-    user_id: str
-    stock: str
-    prediction: str  # "up" or "down"
 
 
 async def fetch_ai_prediction(stock: str) -> PredictionResponse:
@@ -35,13 +20,13 @@ async def fetch_ai_prediction(stock: str) -> PredictionResponse:
 
 
 # Returns today's AI prediction for a given stock
-@app.get("/prediction/today")
+@router.get("/prediction/today")
 async def get_prediction(stock: str = "AAPL"):
     return await fetch_ai_prediction(stock)
 
 
 # Returns the AI's past prediction history for a given stock
-@app.get("/prediction/history")
+@router.get("/prediction/history")
 async def get_prediction_history(stock: str = "AAPL", limit: int = 10):
     # TODO: query Supabase ai_predictions table
     mock_history = [
