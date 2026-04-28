@@ -25,7 +25,7 @@ const config: Config = {
         arcade: ["var(--font-arcade)", "monospace"]
       },
       boxShadow: {
-        glow: "0 0 0 1px rgba(0,240,255,1), 4px 4px 0px 0px rgba(0,240,255,0.4)", // Hard Arcade glow
+        glow: "0 0 0 1px rgb(var(--color-primary)), 4px 4px 0px 0px rgb(var(--color-primary) / 0.4)", // Hard Arcade glow
         block: "4px 4px 0px 0px"
       },
       animation: {

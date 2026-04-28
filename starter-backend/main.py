@@ -1,28 +1,30 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
+from ai_routes import router as ai_router
+from monitoring import MonitoringMiddleware
+from database import create_db_pool
 
+load_dotenv()
 
-# Create a FastAPI instance
 app = FastAPI()
+app.add_middleware(MonitoringMiddleware)
+app.include_router(ai_router)
 
-# Mount the static files directory
-app.mount("/static", StaticFiles(directory="static"), name="static")
 
-@app.get("/")
-async def root():
-    return {"message": "Hello World"}
+@app.on_event("startup")
+async def startup():
+    app.db_pool = await create_db_pool()
 
-@app.get("/greeting/{name}")
-async def read_item(name: str):
-    return {"message": f"Hello {name}"}
 
-# Add CORS middleware
+@app.on_event("shutdown")
+async def shutdown():
+    await app.db_pool.close()
+
 app.add_middleware(
-    CORSMiddleware,                             # CORS middleware class
-    allow_origins=["http://localhost:3000"],    # Only allow requests from this origin
-    allow_credentials=True,                     # Lets browser access response cookies, auth headers, etc.
-    allow_methods=["*"],                        # Allow all request methods
-    allow_headers=["*"],                        # Allow all request headers
+    CORSMiddleware,
+    allow_origins=["http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
-
