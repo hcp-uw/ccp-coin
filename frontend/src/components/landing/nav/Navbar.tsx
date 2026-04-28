@@ -48,7 +48,7 @@ export function Navbar(props: NavbarProps) {
 
     return (
       <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian shrink-0">
-        <nav className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
+        <nav aria-label="dashboard navigation" className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
           {wordmark}
 
           {props.stats && (
@@ -96,6 +96,13 @@ export function Navbar(props: NavbarProps) {
             )}
             <ArcadeButton
               variant="neutral"
+              onClick={() => { playSfx("click"); window.location.href = "/history"; }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              HISTORY
+            </ArcadeButton>
+            <ArcadeButton
+              variant="neutral"
               onClick={() => { playSfx("click"); props.onProfile(); }}
               onMouseEnter={() => playSfx("hover")}
             >
@@ -135,7 +142,7 @@ export function Navbar(props: NavbarProps) {
   // Public variant
   return (
     <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav aria-label="dashboard navigation" className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-6">
           {wordmark}
           <div className="hidden items-center gap-4 lg:flex">

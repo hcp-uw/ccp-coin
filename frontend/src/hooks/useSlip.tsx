@@ -2,15 +2,23 @@
 
 import { createContext, useContext, useReducer, type ReactNode } from "react";
 import type { SlipPick } from "@/types/slip";
+import { randomId } from "@/lib/random";
 
-type SlipState = {
+export type PlacedPick = SlipPick & { betId: string };
+
+export type SlipDirection = "MORE" | "LESS";
+
+export type SlipState = {
   picks: SlipPick[];
+  placedPicks: PlacedPick[];
 };
 
 type SlipAction =
   | { type: "ADD_PICK"; payload: SlipPick }
   | { type: "REMOVE_PICK"; payload: string }
-  | { type: "CLEAR_SLIP" };
+  | { type: "CLEAR_SLIP" }
+  | { type: "PLACE_BET" }
+  | { type: "CLEAR_PLACED_PICKS" };
 
 function slipReducer(state: SlipState, action: SlipAction): SlipState {
   switch (action.type) {
@@ -19,14 +27,26 @@ function slipReducer(state: SlipState, action: SlipAction): SlipState {
       if (existingIndex >= 0) {
         const newPicks = [...state.picks];
         newPicks[existingIndex] = action.payload;
-        return { picks: newPicks };
+        return { picks: newPicks, placedPicks: state.placedPicks };
       }
-      return { picks: [...state.picks, action.payload] };
+      return { picks: [...state.picks, action.payload], placedPicks: state.placedPicks };
     }
     case "REMOVE_PICK":
-      return { picks: state.picks.filter(p => p.symbol !== action.payload) };
+      return {
+        picks: state.picks.filter(p => p.symbol !== action.payload),
+        placedPicks: state.placedPicks.filter(p => p.symbol !== action.payload),
+      };
     case "CLEAR_SLIP":
-      return { picks: [] };
+      return { picks: [], placedPicks: [] };
+    case "PLACE_BET": {
+      const newPlaced = state.picks.map(pick => ({
+        ...pick,
+        betId: randomId(),
+      }));
+      return { picks: state.picks, placedPicks: [...state.placedPicks, ...newPlaced] };
+    }
+    case "CLEAR_PLACED_PICKS":
+      return { picks: [], placedPicks: [] };
     default:
       return state;
   }
@@ -52,7 +72,7 @@ type SlipProviderProps = {
 };
 
 export function SlipProvider({ children }: SlipProviderProps) {
-  const [state, dispatch] = useReducer(slipReducer, { picks: [] });
+  const [state, dispatch] = useReducer(slipReducer, { picks: [], placedPicks: [] });
   return (
     <SlipContext.Provider value={{ state, dispatch }}>
       {children}
