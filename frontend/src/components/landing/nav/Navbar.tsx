@@ -2,8 +2,7 @@
 
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+
 import { content } from "@/content/content";
 import { MobileMenu } from "./MobileMenu";
 import { AudioToggle, useAudio } from "@/components/AudioController";
@@ -22,7 +21,6 @@ type NavbarProps =
 
 export function Navbar(props: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
   const { playSfx } = useAudio();
 
   const wordmark = (
@@ -33,9 +31,6 @@ export function Navbar(props: NavbarProps) {
       </span>
     </div>
   );
-
-  const navLinkClass = (href: string) =>
-    `font-arcade text-[9px] uppercase tracking-[0.2em] transition ${pathname === href ? "text-xp" : "text-muted hover:text-text"}`;
 
   if (props.variant === "dashboard") {
     const streakBorderClass = props.stats
@@ -49,7 +44,18 @@ export function Navbar(props: NavbarProps) {
     return (
       <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian shrink-0">
         <nav className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
-          {wordmark}
+          <div className="flex items-center gap-4">
+            {wordmark}
+            <div className="hidden lg:flex">
+              <ArcadeButton
+                variant="success"
+                onClick={() => { playSfx("click"); window.location.href = "/dashboard"; }}
+                onMouseEnter={() => playSfx("hover")}
+              >
+                DASHBOARD
+              </ArcadeButton>
+            </div>
+          </div>
 
           {props.stats && (
             <div className="hidden lg:flex items-center gap-2">
@@ -128,14 +134,6 @@ export function Navbar(props: NavbarProps) {
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-6">
           {wordmark}
-          <div className="hidden items-center gap-4 lg:flex">
-            <Link href="/dashboard" className={navLinkClass("/dashboard")}>
-              Dashboard
-            </Link>
-            <Link href="/leaderboard" className={navLinkClass("/leaderboard")}>
-              Leaderboard
-            </Link>
-          </div>
         </div>
 
         <div className="hidden items-center gap-6 md:flex">
