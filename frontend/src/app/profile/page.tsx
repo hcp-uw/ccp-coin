@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { MotionConfig } from "framer-motion";
 
 import { ArcadeButton } from "@/components/shared/ArcadeButton";
@@ -9,22 +8,8 @@ import { ScrollWithProgress } from "@/components/shared/ScrollWithProgress";
 import { MOCK_FRIENDS, MOCK_USER } from "@/content/mockData";
 
 export default function ProfilePage() {
-  const [showPassword, setShowPassword] = useState(false);
-  const [passwordCheck, setPasswordCheck] = useState("");
-  const [revealMessage, setRevealMessage] = useState("Enter your password to reveal it.");
-
   const maskedPassword = "••••••••••••";
-  const actualPassword = "hunter2";
-  const friendCount = MOCK_FRIENDS.length - 1;
-
-  const handleRevealPassword = () => {
-    if (passwordCheck.trim()) {
-      setShowPassword(true);
-      setRevealMessage("Password revealed for this session.");
-      return;
-    }
-    setRevealMessage("Enter your password first.");
-  };
+  const friendCount = MOCK_FRIENDS.filter((f) => !f.isCurrentUser).length;
 
   return (
     <MotionConfig reducedMotion="user">
@@ -112,38 +97,11 @@ export default function ProfilePage() {
                   <p className="font-arcade text-[9px] uppercase tracking-[0.24em] text-muted">Security</p>
                   <h2 className="mt-1.5 font-arcade text-base text-danger sm:text-xl">Password</h2>
                   <p className="mt-2 font-mono text-xs leading-5 text-text/80 sm:text-sm sm:leading-6">
-                    Stays masked until you confirm it.
+                    Passwords are never displayed. Use account settings to change it.
                   </p>
-                  <div className="mt-4 flex flex-col gap-3">
-                    <div className="border border-border bg-obsidian px-3 py-2.5 font-mono text-sm text-text sm:px-4 sm:py-3">
-                      <span className="text-muted">Password:</span>{" "}
-                      {showPassword ? actualPassword : maskedPassword}
-                    </div>
-                    <input
-                      type="password"
-                      value={passwordCheck}
-                      onChange={(e) => setPasswordCheck(e.target.value)}
-                      placeholder="Re-enter password"
-                      className="w-full border border-border bg-obsidian px-3 py-2.5 font-mono text-sm text-text outline-none placeholder:text-muted sm:px-4 sm:py-3"
-                    />
-                    <div className="flex flex-wrap gap-2 sm:gap-3">
-                      <ArcadeButton variant="danger" onClick={handleRevealPassword}>
-                        REVEAL
-                      </ArcadeButton>
-                      <ArcadeButton
-                        variant="neutral"
-                        onClick={() => {
-                          setShowPassword(false);
-                          setPasswordCheck("");
-                          setRevealMessage("Enter your password to reveal it.");
-                        }}
-                      >
-                        CLEAR
-                      </ArcadeButton>
-                    </div>
-                    <p className="font-mono text-[10px] uppercase tracking-[0.14em] text-muted">
-                      {revealMessage}
-                    </p>
+                  <div className="mt-4 border border-border bg-obsidian px-3 py-2.5 font-mono text-sm text-text sm:px-4 sm:py-3">
+                    <span className="text-muted">Password:</span>{" "}
+                    {maskedPassword}
                   </div>
                 </article>
 
@@ -153,7 +111,7 @@ export default function ProfilePage() {
                   <div className="mt-4 border border-border bg-obsidian p-4">
                     <p className="font-arcade text-3xl text-primary">#{MOCK_USER.rank}</p>
                     <p className="mt-2 font-mono text-xs text-text/80 sm:text-sm">
-                      Ahead of {friendCount - 1} visible friends.
+                      Ahead of {friendCount} friends.
                     </p>
                   </div>
                 </article>
