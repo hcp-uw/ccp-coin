@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Press_Start_2P, JetBrains_Mono } from "next/font/google";
 import { AudioProvider } from "@/components/AudioController";
+import { CurrencyProvider } from "@/hooks/useCurrency";
+import { BettingHistoryProvider } from "@/hooks/useBettingHistory";
+import { SlipProvider } from "@/hooks/useSlip";
 import { AppShell } from "@/components/landing/nav/AppShell";
 import "./globals.css";
 
@@ -32,7 +35,13 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${arcadeFont.variable} ${monoFont.variable} font-mono bg-obsidian text-text crt-screen`}>
         <AudioProvider>
-          <AppShell>{children}</AppShell>
+          <CurrencyProvider>
+            <BettingHistoryProvider>
+              <SlipProvider>
+                <AppShell>{children}</AppShell>
+              </SlipProvider>
+            </BettingHistoryProvider>
+          </CurrencyProvider>
         </AudioProvider>
       </body>
     </html>

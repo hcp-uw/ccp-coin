@@ -45,20 +45,19 @@ export function Navbar(props: NavbarProps) {
 
     return (
       <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian shrink-0">
-        <nav className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
-          <div className="flex items-center gap-4">
-            {wordmark}
-            <div className="hidden lg:flex">
-              <ArcadeButton
-                variant="success"
-                onClick={() => { playSfx("click"); router.push("/dashboard"); }}
-                onMouseEnter={() => playSfx("hover")}
-              >
-                DASHBOARD
-              </ArcadeButton>
-            </div>
+      <nav aria-label="dashboard navigation" className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-4">
+          {wordmark}
+          <div className="hidden lg:flex">
+            <ArcadeButton
+              variant="success"
+              onClick={() => { playSfx("click"); router.push("/dashboard"); }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              DASHBOARD
+            </ArcadeButton>
           </div>
-
+        </div>
           {props.stats && (
             <div className="hidden lg:flex items-center gap-2">
               <div className="border-[2px] border-border bg-surface/60 px-3 py-1 flex flex-col items-center gap-0.5">
@@ -93,15 +92,13 @@ export function Navbar(props: NavbarProps) {
             <span className="border-[2px] border-border bg-surface px-3 py-1 font-arcade text-[8px] text-muted">
               {props.username}
             </span>
-            {props.onHome && (
-              <ArcadeButton
-                variant="success"
-                onClick={() => { playSfx("click"); props.onHome!(); }}
-                onMouseEnter={() => playSfx("hover")}
-              >
-                DASHBOARD
-              </ArcadeButton>
-            )}
+            <ArcadeButton
+              variant="neutral"
+              onClick={() => { playSfx("click"); window.location.href = "/history"; }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              HISTORY
+            </ArcadeButton>
             <ArcadeButton
               variant="neutral"
               onClick={() => { playSfx("click"); props.onProfile(); }}
@@ -143,7 +140,7 @@ export function Navbar(props: NavbarProps) {
   // Public variant
   return (
     <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
+      <nav aria-label="dashboard navigation" className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-6">
           {wordmark}
         </div>
