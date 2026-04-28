@@ -16,6 +16,15 @@ export type AIInsight = {
   sources: string[];
 };
 
+export type EodPrediction = {
+  direction: "Up" | "Down";
+  confidence: number;
+  targetPrice: string;
+  profitProbability: number;
+  rationale: string[];
+  timeframe: string;
+};
+
 export type LeaderboardRow = {
   rank: number;
   name: string;
@@ -47,6 +56,7 @@ export type TrendingPick = {
   aiConfidence: number;
   aiDirection: "MORE" | "LESS";
   sparkline: number[];
+  eodPrediction: EodPrediction;
 };
 
 export const tickers: Ticker[] = [
@@ -187,12 +197,30 @@ export const MOCK_WATCHLIST_TICKERS: WatchlistTicker[] = [
 ];
 
 export const MOCK_TRENDING_PICKS: TrendingPick[] = [
-  { symbol: "AAPL", name: "Apple", price: "$189.32", change: "+1.2%", morePct: 72, aiConfidence: 62, aiDirection: "MORE", sparkline: [92,95,91,96,101,98,104,110] },
-  { symbol: "TSLA", name: "Tesla", price: "$243.80", change: "-0.7%", morePct: 38, aiConfidence: 55, aiDirection: "LESS", sparkline: [120,118,116,114,116,111,109,112] },
-  { symbol: "MSFT", name: "Microsoft", price: "$416.12", change: "+0.4%", morePct: 65, aiConfidence: 58, aiDirection: "MORE", sparkline: [80,82,85,84,88,92,91,95] },
-  { symbol: "NVDA", name: "Nvidia", price: "$875.40", change: "+2.1%", morePct: 81, aiConfidence: 74, aiDirection: "MORE", sparkline: [200,215,210,225,240,235,260,275] },
-  { symbol: "AMZN", name: "Amazon", price: "$178.25", change: "-0.3%", morePct: 44, aiConfidence: 51, aiDirection: "LESS", sparkline: [165,168,170,166,172,169,175,174] },
-  { symbol: "META", name: "Meta", price: "$512.60", change: "+0.9%", morePct: 68, aiConfidence: 63, aiDirection: "MORE", sparkline: [490,495,488,502,510,505,515,512] },
+  { 
+    symbol: "AAPL", name: "Apple", price: "$189.32", change: "+1.2%", morePct: 72, aiConfidence: 62, aiDirection: "MORE", sparkline: [92,95,91,96,101,98,104,110],
+    eodPrediction: { direction: "Up", confidence: 62, targetPrice: "$192.50", profitProbability: 68, rationale: ["Strong hardware sales data", "Options flow bullish"], timeframe: "By Market Close" }
+  },
+  { 
+    symbol: "TSLA", name: "Tesla", price: "$243.80", change: "-0.7%", morePct: 38, aiConfidence: 55, aiDirection: "LESS", sparkline: [120,118,116,114,116,111,109,112],
+    eodPrediction: { direction: "Down", confidence: 55, targetPrice: "$238.10", profitProbability: 60, rationale: ["Delivery numbers miss", "Sector weakness"], timeframe: "By Market Close" }
+  },
+  { 
+    symbol: "MSFT", name: "Microsoft", price: "$416.12", change: "+0.4%", morePct: 65, aiConfidence: 58, aiDirection: "MORE", sparkline: [80,82,85,84,88,92,91,95],
+    eodPrediction: { direction: "Up", confidence: 58, targetPrice: "$419.00", profitProbability: 64, rationale: ["Cloud revenue growth", "Trendline support holds"], timeframe: "By Market Close" }
+  },
+  { 
+    symbol: "NVDA", name: "Nvidia", price: "$875.40", change: "+2.1%", morePct: 81, aiConfidence: 74, aiDirection: "MORE", sparkline: [200,215,210,225,240,235,260,275],
+    eodPrediction: { direction: "Up", confidence: 74, targetPrice: "$890.20", profitProbability: 82, rationale: ["AI chip demand surge", "Upgraded guidance"], timeframe: "By Market Close" }
+  },
+  { 
+    symbol: "AMZN", name: "Amazon", price: "$178.25", change: "-0.3%", morePct: 44, aiConfidence: 51, aiDirection: "LESS", sparkline: [165,168,170,166,172,169,175,174],
+    eodPrediction: { direction: "Down", confidence: 65, targetPrice: "$174.50", profitProbability: 70, rationale: ["Retail margins shrink", "Heavy resistance at $180"], timeframe: "By Market Close" }
+  },
+  { 
+    symbol: "META", name: "Meta", price: "$512.60", change: "+0.9%", morePct: 68, aiConfidence: 63, aiDirection: "MORE", sparkline: [490,495,488,502,510,505,515,512],
+    eodPrediction: { direction: "Down", confidence: 70, targetPrice: "$505.00", profitProbability: 75, rationale: ["Ad spend pulling back", "Overbought technically"], timeframe: "By Market Close" }
+  },
 ];
 
 export const MOCK_FRIENDS: Friend[] = [
