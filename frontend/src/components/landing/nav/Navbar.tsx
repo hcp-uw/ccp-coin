@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useRouter } from "next/navigation";
+
 import { content } from "@/content/content";
 import { MobileMenu } from "./MobileMenu";
 import { AudioToggle, useAudio } from "@/components/AudioController";
@@ -22,8 +22,8 @@ type NavbarProps =
 
 export function Navbar(props: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
   const { playSfx } = useAudio();
+  const router = useRouter();
 
   const wordmark = (
     <div className="flex items-center gap-3">
@@ -33,9 +33,6 @@ export function Navbar(props: NavbarProps) {
       </span>
     </div>
   );
-
-  const navLinkClass = (href: string) =>
-    `font-arcade text-[9px] uppercase tracking-[0.2em] transition ${pathname === href ? "text-xp" : "text-muted hover:text-text"}`;
 
   if (props.variant === "dashboard") {
     const streakBorderClass = props.stats
@@ -48,9 +45,19 @@ export function Navbar(props: NavbarProps) {
 
     return (
       <header className="sticky top-0 z-40 border-b-[2px] border-border bg-obsidian shrink-0">
-        <nav aria-label="dashboard navigation" className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
+      <nav aria-label="dashboard navigation" className="mx-auto flex max-w-full items-center justify-between px-6 py-3">
+        <div className="flex items-center gap-4">
           {wordmark}
-
+          <div className="hidden lg:flex">
+            <ArcadeButton
+              variant="success"
+              onClick={() => { playSfx("click"); router.push("/dashboard"); }}
+              onMouseEnter={() => playSfx("hover")}
+            >
+              DASHBOARD
+            </ArcadeButton>
+          </div>
+        </div>
           {props.stats && (
             <div className="hidden lg:flex items-center gap-2">
               <div className="border-[2px] border-border bg-surface/60 px-3 py-1 flex flex-col items-center gap-0.5">
@@ -85,15 +92,6 @@ export function Navbar(props: NavbarProps) {
             <span className="border-[2px] border-border bg-surface px-3 py-1 font-arcade text-[8px] text-muted">
               {props.username}
             </span>
-            {props.onHome && (
-              <ArcadeButton
-                variant="success"
-                onClick={() => { playSfx("click"); props.onHome!(); }}
-                onMouseEnter={() => playSfx("hover")}
-              >
-                DASHBOARD
-              </ArcadeButton>
-            )}
             <ArcadeButton
               variant="neutral"
               onClick={() => { playSfx("click"); window.location.href = "/history"; }}
@@ -110,7 +108,7 @@ export function Navbar(props: NavbarProps) {
             </ArcadeButton>
             <ArcadeButton
               variant="warning"
-              onClick={() => { playSfx("click"); window.location.href = "/leaderboard"; }}
+              onClick={() => { playSfx("click"); router.push("/leaderboard"); }}
               onMouseEnter={() => playSfx("hover")}
             >
               LEADERBOARD
@@ -145,14 +143,6 @@ export function Navbar(props: NavbarProps) {
       <nav aria-label="dashboard navigation" className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <div className="flex items-center gap-6">
           {wordmark}
-          <div className="hidden items-center gap-4 lg:flex">
-            <Link href="/dashboard" className={navLinkClass("/dashboard")}>
-              Dashboard
-            </Link>
-            <Link href="/leaderboard" className={navLinkClass("/leaderboard")}>
-              Leaderboard
-            </Link>
-          </div>
         </div>
 
         <div className="hidden items-center gap-6 md:flex">
