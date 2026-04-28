@@ -1,11 +1,31 @@
 import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import DashboardPage from "@/app/dashboard/page";
+import { SlipProvider } from "@/hooks/useSlip";
+import { CurrencyProvider } from "@/hooks/useCurrency";
+import { BettingHistoryProvider } from "@/hooks/useBettingHistory";
+import { AudioProvider } from "@/components/AudioController";
+
+vi.mock("@/components/AudioController", () => ({
+  AudioProvider: ({ children }: { children: React.ReactNode }) => children,
+  useAudio: () => ({ playSfx: vi.fn(), isMuted: false, toggleMute: vi.fn() }),
+  AudioToggle: () => <button>Toggle Sound</button>,
+}));
 
 function setup() {
   const user = userEvent.setup();
-  render(<DashboardPage />);
+  render(
+    <AudioProvider>
+      <CurrencyProvider>
+        <BettingHistoryProvider>
+          <SlipProvider>
+            <DashboardPage />
+          </SlipProvider>
+        </BettingHistoryProvider>
+      </CurrencyProvider>
+    </AudioProvider>
+  );
   return { user };
 }
 

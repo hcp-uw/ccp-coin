@@ -1,18 +1,28 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import ProfilePage from "@/app/profile/page";
+
+vi.mock("@/components/AudioController", () => ({
+  useAudio: () => ({
+    playSfx: vi.fn(),
+    isMuted: false,
+    toggleMute: vi.fn(),
+  }),
+  AudioToggle: () => <button>Toggle Sound</button>,
+}));
 
 describe("ProfilePage", () => {
   it("shows the main profile stats", () => {
     render(<ProfilePage />);
 
     expect(screen.getByRole("navigation", { name: /dashboard navigation/i })).toBeInTheDocument();
-    expect(screen.getByText(/account overview/i)).toBeInTheDocument();
-    expect(screen.getByText(/balance/i)).toBeInTheDocument();
-    expect(screen.getByText(/leaderboard/i)).toBeInTheDocument();
-    expect(screen.getByText(/accuracy/i)).toBeInTheDocument();
-    expect(screen.getByText(/friends/i)).toBeInTheDocument();
+    const main = screen.getByRole("main");
+    expect(within(main).getAllByText(/account overview/i).length).toBeGreaterThan(0);
+    expect(within(main).getAllByText(/balance/i).length).toBeGreaterThan(0);
+    expect(within(main).getAllByText(/leaderboard position/i).length).toBeGreaterThan(0);
+    expect(within(main).getAllByText(/accuracy/i).length).toBeGreaterThan(0);
+    expect(within(main).getAllByText(/friends/i).length).toBeGreaterThan(0);
   });
 
   it("keeps the password masked until reveal is requested", async () => {
