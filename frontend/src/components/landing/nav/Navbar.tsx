@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FiMenu } from "react-icons/fi";
+import { useRouter } from "next/navigation";
 
 import { content } from "@/content/content";
 import { MobileMenu } from "./MobileMenu";
@@ -22,6 +23,7 @@ type NavbarProps =
 export function Navbar(props: NavbarProps) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { playSfx } = useAudio();
+  const router = useRouter();
 
   const wordmark = (
     <div className="flex items-center gap-3">
@@ -49,7 +51,7 @@ export function Navbar(props: NavbarProps) {
             <div className="hidden lg:flex">
               <ArcadeButton
                 variant="success"
-                onClick={() => { playSfx("click"); window.location.href = "/dashboard"; }}
+                onClick={() => { playSfx("click"); router.push("/dashboard"); }}
                 onMouseEnter={() => playSfx("hover")}
               >
                 DASHBOARD
@@ -109,7 +111,7 @@ export function Navbar(props: NavbarProps) {
             </ArcadeButton>
             <ArcadeButton
               variant="warning"
-              onClick={() => { playSfx("click"); window.location.href = "/leaderboard"; }}
+              onClick={() => { playSfx("click"); router.push("/leaderboard"); }}
               onMouseEnter={() => playSfx("hover")}
             >
               LEADERBOARD
