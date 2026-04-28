@@ -39,7 +39,7 @@ export function AppShell({ children }: AppShellProps) {
         onLogout={handleLogout}
         onProfile={handleProfile}
       />
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto">
         {children}
       </div>
     </div>
