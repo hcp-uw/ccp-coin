@@ -6,20 +6,68 @@ import type { ReactNode } from "react";
 import { MotionConfig } from "framer-motion";
 import { Navbar } from "@/components/landing/nav/Navbar";
 import { HeroSection } from "@/components/landing/hero/HeroSection";
-// We import these but only show them in modals now
 import { HowItWorksSection } from "@/components/landing/how-it-works/HowItWorksSection";
 import { FAQSection } from "@/components/landing/faq/FAQSection";
 import { LeaderboardSection } from "@/components/landing/leaderboard/LeaderboardSection";
 import { useAudio } from "@/components/AudioController";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
+import { supabase } from "@/lib/supabase";
 
 export default function Page() {
-  const [activeModal, setActiveModal] = useState<"signin" | "signup" | "how" | "faq" | "leaderboard" | null>(null);
+  const [activeModal, setActiveModal] = useState<
+    "signin" | "signup" | "how" | "faq" | "leaderboard" | null
+  >(null);
+
   const { playSfx } = useAudio();
   const router = useRouter();
 
-  const handleAuth = (e: React.FormEvent) => {
+  // SIGN UP
+  const handleSignUp = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
     e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error } = await supabase.auth.signUp({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
+
+    router.push("/dashboard");
+  };
+
+  // SIGN IN
+  const handleSignIn = async (
+    e: React.FormEvent<HTMLFormElement>
+  ) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.currentTarget);
+
+    const email = formData.get("email") as string;
+    const password = formData.get("password") as string;
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      console.error(error);
+      alert(error.message);
+      return;
+    }
+
     router.push("/dashboard");
   };
 
@@ -33,8 +81,17 @@ export default function Page() {
 
   useEscapeKey(closeModal, activeModal !== null);
 
-  const RetroModal = ({ title, isOpen, children }: { title: string, isOpen: boolean, children: ReactNode }) => {
+  const RetroModal = ({
+    title,
+    isOpen,
+    children,
+  }: {
+    title: string;
+    isOpen: boolean;
+    children: ReactNode;
+  }) => {
     if (!isOpen) return null;
+
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-obsidian/90 p-4 backdrop-blur-sm">
         <div
@@ -50,9 +107,16 @@ export default function Page() {
           >
             [ESC] CLOSE
           </button>
+
           <div className="mb-8 border-b-[2px] border-border pb-4">
-            <h2 id="retro-modal-title" className="font-arcade text-2xl text-primary md:text-3xl">{title}</h2>
+            <h2
+              id="retro-modal-title"
+              className="font-arcade text-2xl text-primary md:text-3xl"
+            >
+              {title}
+            </h2>
           </div>
+
           <div className="prose prose-invert max-w-none font-mono text-text">
             {children}
           </div>
@@ -64,19 +128,25 @@ export default function Page() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="page-shell flex h-screen flex-col overflow-hidden bg-obsidian relative">
-        <Navbar variant="public" onSignIn={openSignIn} onSignUp={openSignUp} />
+        <Navbar
+          variant="public"
+          onSignIn={openSignIn}
+          onSignUp={openSignUp}
+        />
 
-        {/* Main Attract Mode Screen */}
+        {/* Main Screen */}
         <main className="flex-1 overflow-hidden relative mx-auto w-full max-w-[1400px] px-6 py-6 md:py-12 flex flex-col justify-center">
           <HeroSection
             onSignUp={openSignUp}
             onOpenHow={() => setActiveModal("how")}
             onOpenFAQ={() => setActiveModal("faq")}
-            onOpenLeaderboard={() => setActiveModal("leaderboard")}
+            onOpenLeaderboard={() =>
+              setActiveModal("leaderboard")
+            }
           />
         </main>
 
-        {/* Footer info strip */}
+        {/* Footer */}
         <footer className="border-t-[2px] border-border bg-obsidian py-2 px-6">
           <div className="mx-auto flex max-w-6xl justify-between items-center font-arcade text-[8px] text-muted md:text-[10px]">
             <span>© 2026 BLOOM ARCADE. ALL RIGHTS RESERVED.</span>
@@ -84,75 +154,116 @@ export default function Page() {
           </div>
         </footer>
 
-        {/* --- Modals --- */}
-        <RetroModal title="SIGN IN" isOpen={activeModal === "signin"}>
-          <form className="mx-auto w-full max-w-md space-y-6" onSubmit={handleAuth}>
+        {/* SIGN IN MODAL */}
+        <RetroModal
+          title="SIGN IN"
+          isOpen={activeModal === "signin"}
+        >
+          <form
+            className="mx-auto w-full max-w-md space-y-6"
+            onSubmit={handleSignIn}
+          >
             <label className="block font-arcade text-[10px] uppercase text-primary">
               UW Email
               <input
+                name="email"
                 type="email"
-                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text"
                 placeholder="name@uw.edu"
               />
             </label>
+
             <label className="block font-arcade text-[10px] uppercase text-primary">
               Password
               <input
+                name="password"
                 type="password"
-                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text"
                 placeholder="••••••••"
               />
             </label>
+
             <button
               type="submit"
-              className="w-full border-[2px] border-xp bg-xp px-4 py-4 font-arcade text-sm text-obsidian transition-colors hover:bg-xp/90 hover:shadow-[4px_4px_0px_0px_rgba(255,215,0,0.4)]"
+              className="w-full border-[2px] border-xp bg-xp px-4 py-4 font-arcade text-sm text-obsidian"
             >
               LOGIN
             </button>
           </form>
         </RetroModal>
 
-        <RetroModal title="NEW CHALLENGER (SIGN UP)" isOpen={activeModal === "signup"}>
-          <form className="mx-auto w-full max-w-md space-y-6" onSubmit={handleAuth}>
+        {/* SIGN UP MODAL */}
+        <RetroModal
+          title="NEW CHALLENGER (SIGN UP)"
+          isOpen={activeModal === "signup"}
+        >
+          <form
+            className="mx-auto w-full max-w-md space-y-6"
+            onSubmit={handleSignUp}
+          >
             <label className="block font-arcade text-[10px] uppercase text-primary">
               UW Email
               <input
+                name="email"
                 type="email"
-                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text"
                 placeholder="name@uw.edu"
               />
             </label>
+
             <label className="block font-arcade text-[10px] uppercase text-primary">
               Expected Grad Year
               <input
                 type="text"
-                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text"
                 placeholder="2027"
               />
             </label>
+
+            <label className="block font-arcade text-[10px] uppercase text-primary">
+              Password
+              <input
+                name="password"
+                type="password"
+                className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text"
+                placeholder="••••••••"
+              />
+            </label>
+
             <button
               type="submit"
-              className="w-full border-[2px] border-xp bg-xp px-4 py-4 font-arcade text-sm text-obsidian transition-colors hover:bg-xp/90 hover:shadow-[4px_4px_0px_0px_rgba(255,215,0,0.4)]"
+              className="w-full border-[2px] border-xp bg-xp px-4 py-4 font-arcade text-sm text-obsidian"
             >
               JOIN THE ARENA
             </button>
           </form>
         </RetroModal>
 
-        <RetroModal title="INSTRUCTION MANUAL" isOpen={activeModal === "how"}>
+        {/* HOW IT WORKS */}
+        <RetroModal
+          title="INSTRUCTION MANUAL"
+          isOpen={activeModal === "how"}
+        >
           <HowItWorksSection />
         </RetroModal>
 
-        <RetroModal title="SYSTEM FAQ" isOpen={activeModal === "faq"}>
+        {/* FAQ */}
+        <RetroModal
+          title="SYSTEM FAQ"
+          isOpen={activeModal === "faq"}
+        >
           <FAQSection />
         </RetroModal>
 
-        <RetroModal title="HALL OF FAME" isOpen={activeModal === "leaderboard"}>
+        {/* LEADERBOARD */}
+        <RetroModal
+          title="HALL OF FAME"
+          isOpen={activeModal === "leaderboard"}
+        >
           <div className="pb-8">
             <LeaderboardSection />
           </div>
         </RetroModal>
-
       </div>
     </MotionConfig>
   );
