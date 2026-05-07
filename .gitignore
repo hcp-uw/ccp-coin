@@ -3,6 +3,7 @@
 .env*
 .next/
 frontend/.next/
+frontend/.env.local
 frontend/test-results/
 frontend/playwright-report/
 frontend/playwright/.cache/
