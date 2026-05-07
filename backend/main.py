@@ -3,12 +3,15 @@ from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from ai_routes import router as ai_router
 from stock_routes import router as stock_router
+from middleware.auth import AuthMiddleware
+from routes.auth_routes import router as auth_router
 
 load_dotenv()
 
 app = FastAPI()
 app.include_router(ai_router)
 app.include_router(stock_router)
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -17,6 +20,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 def root():
