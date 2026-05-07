@@ -9,7 +9,9 @@ import { ProjectionTileGrid } from "@/components/dashboard/ProjectionTileGrid";
 import { SlipDrawer } from "@/components/dashboard/SlipDrawer";
 import { SocialPanel } from "@/components/dashboard/SocialPanel";
 import { MobileBottomNav } from "@/components/dashboard/MobileBottomNav";
-import { SlipProvider, useSlip } from "@/hooks/useSlip";
+import { useSlip } from "@/hooks/useSlip";
+import { useCurrency } from "@/hooks/useCurrency";
+import { useBettingHistory } from "@/hooks/useBettingHistory";
 import { ScrollWithProgress } from "@/components/shared/ScrollWithProgress";
 import {
   MOCK_USER,
@@ -26,39 +28,74 @@ export default function DashboardPage() {
   const [mobileView, setMobileView] = useState<"picks" | "watchlist" | "social">("picks");
 
   return (
-    <SlipProvider>
       <DashboardContent mobileView={mobileView} onViewChange={setMobileView} />
-    </SlipProvider>
   );
 }
 
-function DashboardContent({ 
-  mobileView, 
-  onViewChange 
-}: { 
+function DashboardContent({
+  mobileView,
+  onViewChange
+}: {
   mobileView: "picks" | "watchlist" | "social";
   onViewChange: (view: "picks" | "watchlist" | "social") => void;
 }) {
-  const { state, dispatch } = useSlip();
-  const picks = state.picks;
+  const { state: slipState, dispatch: slipDispatch } = useSlip();
+  const { state: currencyState, deduct } = useCurrency();
+  const { recordBet } = useBettingHistory();
+  const picks = slipState.picks;
+  const placedPicks = slipState.placedPicks;
+
+  const multiplierMap: Record<number, number> = { 1: 2, 2: 3, 3: 5, 4: 8, 5: 12, 6: 18 };
 
   const handleSelectPick = (symbol: string, direction: SlipDirection, price: string, name: string) => {
-    dispatch({
+    slipDispatch({
       type: "ADD_PICK",
       payload: { symbol, direction, price, stake: 100, name },
     });
   };
 
   const handleRemovePick = (symbol: string) => {
-    dispatch({ type: "REMOVE_PICK", payload: symbol });
+    slipDispatch({ type: "REMOVE_PICK", payload: symbol });
   };
 
   const handleClearSlip = () => {
-    dispatch({ type: "CLEAR_SLIP" });
+    slipDispatch({ type: "CLEAR_SLIP" });
   };
 
-  const handlePlaceBet = () => {
-    console.log("Placing bet:", picks);
+  const handlePlaceBet = (): { ok: false; reason: string } | { ok: true } => {
+    if (picks.length === 0) {
+      return { ok: false, reason: "SLIP IS EMPTY" };
+    }
+
+    const totalStake = picks.reduce((sum, p) => sum + p.stake, 0);
+
+    if (currencyState.balance < totalStake) {
+      return { ok: false, reason: `INSUFFICIENT BALANCE — NEED ${totalStake} DC` };
+    }
+
+    const multiplier = multiplierMap[picks.length] ?? picks.length * 3;
+    const now = Date.now();
+
+    picks.forEach((pick) => {
+      const potentialPayout = Math.round(pick.stake * multiplier);
+
+      deduct(pick.stake);
+
+      recordBet({
+          symbol: pick.symbol,
+          name: pick.name,
+          direction: pick.direction,
+          entryPrice: pick.price,
+          stake: pick.stake,
+          odds: multiplier,
+          potentialPayout,
+          status: "PENDING",
+        });
+    });
+
+    slipDispatch({ type: "PLACE_BET" });
+
+    return { ok: true };
   };
 
   const scrollPb =
@@ -128,6 +165,7 @@ function DashboardContent({
       
       <SlipDrawer
         picks={picks}
+        placedPicks={placedPicks}
         onRemovePick={handleRemovePick}
         onClearSlip={handleClearSlip}
         onPlaceBet={handlePlaceBet}

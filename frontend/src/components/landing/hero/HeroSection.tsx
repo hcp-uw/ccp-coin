@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { FiPlay } from "react-icons/fi";
 import { content } from "@/content/content";
-import { tickers, aiInsights } from "@/content/mockData";
+import { MOCK_TRENDING_PICKS } from "@/content/mockData";
 import { PredictionsConsole } from "@/components/PredictionsConsole";
 import { useAudio } from "@/components/AudioController";
 import { ArcadeButton } from "@/components/shared/ArcadeButton";
@@ -78,7 +78,7 @@ export function HeroSection({ onSignUp, onOpenHow, onOpenFAQ, onOpenLeaderboard 
 
       {/* Gameplay Demo (Predictions Console) */}
       <div className="w-full relative z-10 flex justify-center lg:justify-end">
-        <PredictionsConsole tickers={tickers} aiInsights={aiInsights} />
+        <PredictionsConsole picks={MOCK_TRENDING_PICKS} />
       </div>
 
     </section>

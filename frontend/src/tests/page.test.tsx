@@ -2,7 +2,7 @@ import { render, screen, within, waitFor } from "@testing-library/react";
 import { describe, it, expect, vi } from "vitest";
 import userEvent from "@testing-library/user-event";
 import Page from "@/app/page";
-import { aiInsights } from "@/content/mockData";
+import { aiInsights, MOCK_TRENDING_PICKS } from "@/content/mockData";
 
 vi.mock("@/components/AudioController", () => ({
   useAudio: () => ({
@@ -30,8 +30,8 @@ describe("DubQuant Arcade Landing Page", () => {
 
       if (!aaplRow) return;
 
-      const upButton = within(aaplRow).getByRole("radio", { name: /up/i });
-      const downButton = within(aaplRow).getByRole("radio", { name: /dwn/i });
+      const upButton = within(aaplRow as HTMLElement).getByRole("radio", { name: /up/i });
+      const downButton = within(aaplRow as HTMLElement).getByRole("radio", { name: /dwn/i });
 
       // Click UP
       await user.click(upButton);
@@ -50,21 +50,20 @@ describe("DubQuant Arcade Landing Page", () => {
 
     it("displays correct AI insights including confidence scores", async () => {
       const { user } = setup();
-      const symbol = "AAPL";
-      const insight = aiInsights[symbol];
+      const aaplPick = MOCK_TRENDING_PICKS[0];
 
       // Open AI Panel
       const aiButton = screen.getAllByRole("button", { name: /toggle ai insight/i })[0];
       await user.click(aiButton);
 
       // Verify Header
-      expect(screen.getByText("AI SYSTEM")).toBeInTheDocument();
+      expect(screen.getByText("AI PREDICTION")).toBeInTheDocument();
 
-      // Verify Data Integrity
-      expect(screen.getByText(`${insight.confidence}%`)).toBeInTheDocument();
+      // Verify Data Integrity (uses EodPrediction from MOCK_TRENDING_PICKS)
+      expect(screen.getByText(`${aaplPick.eodPrediction.confidence}%`)).toBeInTheDocument();
 
       // Verify Rationale
-      expect(screen.getByText(new RegExp(insight.rationale[0], "i"))).toBeInTheDocument();
+      expect(screen.getByText(new RegExp("Strong hardware sales data", "i"))).toBeInTheDocument();
     });
 
     it("opens the retro stake dropdown and selects a new value", async () => {
@@ -142,14 +141,14 @@ describe("DubQuant Arcade Landing Page", () => {
       const aiButton = screen.getAllByRole("button", { name: /toggle ai insight/i })[0];
       await user.click(aiButton);
 
-      expect(screen.getByText("AI SYSTEM")).toBeInTheDocument();
+      expect(screen.getByText("AI PREDICTION")).toBeInTheDocument();
 
       // Press ESC
       await user.keyboard("{Escape}");
 
       // Verify it's closed
       await waitFor(() => {
-        expect(screen.queryByText("AI SYSTEM")).not.toBeInTheDocument();
+        expect(screen.queryByText("AI PREDICTION")).not.toBeInTheDocument();
       });
     });
   });

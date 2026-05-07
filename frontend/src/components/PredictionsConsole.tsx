@@ -3,8 +3,10 @@
 import { useCallback, useRef, useState } from "react";
 import type { MouseEvent } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
-import { FiCpu, FiChevronDown } from "react-icons/fi";
-import type { AIInsight, Ticker } from "@/content/mockData";
+import { FiChevronDown } from "react-icons/fi";
+import { HiBolt } from "react-icons/hi2";
+import type { TrendingPick } from "@/content/mockData";
+import { AiPredictionPopover } from "@/components/dashboard/AiPredictionPopover";
 import { useOutsideClick } from "@/hooks/useOutsideClick";
 import { useEscapeKey } from "@/hooks/useEscapeKey";
 import { useAudio } from "@/components/AudioController";
@@ -107,70 +109,13 @@ const StakeDropdown = ({ playSfx }: { playSfx: (type: "hover" | "click" | "up" |
   );
 };
 
-const AIPopover = ({
-  insight,
-  onClose
-}: {
-  insight: AIInsight;
-  onClose: () => void;
-}) => {
-  const shouldReduceMotion = useReducedMotion();
-
-  return (
-    <motion.div
-      initial={shouldReduceMotion ? { opacity: 0 } : { opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 8 }}
-      className="absolute right-0 top-full z-20 mt-2 w-80 border-[2px] border-secondary bg-obsidian p-5 shadow-[4px_4px_0px_0px_rgba(184,41,255,0.5)]"
-    >
-      <div className="mb-4 flex items-center justify-between border-b-[2px] border-secondary/30 pb-2">
-        <div className="flex items-center gap-2 font-arcade text-[10px] text-secondary">
-          <FiCpu />
-          <span>AI SYSTEM</span>
-        </div>
-        <button onClick={(e) => { e.stopPropagation(); onClose(); }} className="font-arcade text-[8px] text-muted hover:text-text">
-          [ESC] CLOSE
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <div className="flex items-baseline justify-between">
-            <span className="font-arcade text-[8px] text-text">SIGNAL STRENGTH</span>
-            <span className="font-mono text-xs text-xp font-bold">{insight.confidence}%</span>
-          </div>
-          <div className="mt-2 h-2 w-full border-[2px] border-surface-2 bg-obsidian p-[1px]">
-            <div
-              className={`h-full ${insight.suggestion === "Up" ? "bg-up" : "bg-down"}`}
-              style={{ width: `${insight.confidence}%` }}
-            />
-          </div>
-        </div>
-
-        <div>
-          <p className="font-arcade text-[8px] text-muted">ANALYSIS REQS:</p>
-          <ul className="mt-2 space-y-2">
-            {insight.rationale.slice(0, 2).map((point, i) => (
-              <li key={i} className="flex gap-2 font-mono text-[10px] text-text/90 uppercase">
-                <span className="mt-1 block h-2 w-2 shrink-0 bg-border" />
-                {point}
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-    </motion.div>
-  );
-};
-
 // --- Main Component ---
 
 type PredictionsConsoleProps = {
-  tickers: Ticker[];
-  aiInsights: Record<string, AIInsight>;
+  picks: TrendingPick[];
 };
 
-export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsoleProps) {
+export function PredictionsConsole({ picks }: PredictionsConsoleProps) {
   const [activeRow, setActiveRow] = useState<string | null>(null);
   const [activeAI, setActiveAI] = useState<string | null>(null);
   const [predictions, setPredictions] = useState<Record<string, "Up" | "Down" | null>>({});
@@ -222,7 +167,7 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
 
         {/* Stock List */}
         <div className="divide-y-[2px] divide-border bg-obsidian">
-          {tickers.map((ticker) => {
+          {picks.map((ticker) => {
             const isActive = activeRow === ticker.symbol;
             const isAIOpen = activeAI === ticker.symbol;
             const prediction = predictions[ticker.symbol] ?? null;
@@ -292,13 +237,14 @@ export function PredictionsConsole({ tickers, aiInsights }: PredictionsConsolePr
                         }`}
                       aria-label="Toggle AI Insight"
                     >
-                      <FiCpu size={14} />
+                      <HiBolt size={14} />
                     </button>
 
                     <AnimatePresence>
                       {isAIOpen && (
-                        <AIPopover
-                          insight={aiInsights[ticker.symbol]}
+                        <AiPredictionPopover
+                          prediction={ticker.eodPrediction}
+                          isOpen={isAIOpen}
                           onClose={() => setActiveAI(null)}
                         />
                       )}

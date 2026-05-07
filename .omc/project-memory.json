@@ -1,0 +1,136 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1775750371121,
+  "projectRoot": "/Users/isaiahrivera/Documents/gp/ccp-coin",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "main",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "frontend": {
+      "path": "frontend",
+      "purpose": null,
+      "fileCount": 11,
+      "lastAccessed": 1775750371099,
+      "keyFiles": [
+        "next-env.d.ts",
+        "next.config.mjs",
+        "package-lock.json",
+        "package.json",
+        "playwright.config.ts"
+      ]
+    },
+    "starter-backend": {
+      "path": "starter-backend",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1775750371104,
+      "keyFiles": [
+        "main.py"
+      ]
+    },
+    "starter-frontend-db-example": {
+      "path": "starter-frontend-db-example",
+      "purpose": null,
+      "fileCount": 2,
+      "lastAccessed": 1775750371105,
+      "keyFiles": [
+        "package-lock.json",
+        "package.json"
+      ]
+    },
+    "thoughts": {
+      "path": "thoughts",
+      "purpose": null,
+      "fileCount": 0,
+      "lastAccessed": 1775750371106,
+      "keyFiles": []
+    },
+    "frontend/node_modules": {
+      "path": "frontend/node_modules",
+      "purpose": "Dependencies",
+      "fileCount": 1,
+      "lastAccessed": 1775750371108,
+      "keyFiles": []
+    },
+    "starter-backend/static": {
+      "path": "starter-backend/static",
+      "purpose": "Static files",
+      "fileCount": 5,
+      "lastAccessed": 1775750371109,
+      "keyFiles": [
+        "asset-manifest.json",
+        "favicon.ico",
+        "index.html"
+      ]
+    },
+    "starter-frontend-db-example/public": {
+      "path": "starter-frontend-db-example/public",
+      "purpose": "Public files",
+      "fileCount": 4,
+      "lastAccessed": 1775750371118,
+      "keyFiles": [
+        "favicon.ico",
+        "index.html",
+        "manifest.json"
+      ]
+    },
+    "starter-frontend-db-example/src": {
+      "path": "starter-frontend-db-example/src",
+      "purpose": "Source code",
+      "fileCount": 3,
+      "lastAccessed": 1775750371120,
+      "keyFiles": [
+        "App.css",
+        "App.js",
+        "index.js"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "frontend/src/app/profile/page.tsx",
+      "accessCount": 9,
+      "lastAccessed": 1775753103786,
+      "type": "file"
+    },
+    {
+      "path": "frontend/src/components/landing/nav/Navbar.tsx",
+      "accessCount": 7,
+      "lastAccessed": 1775752229834,
+      "type": "file"
+    },
+    {
+      "path": "frontend/src/components/landing/nav/AppShell.tsx",
+      "accessCount": 2,
+      "lastAccessed": 1775752934933,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
