@@ -1,16 +1,11 @@
-from os import getenv
-import asyncpg
+import os
+from supabase import create_client, Client
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
 load_dotenv()
 
-# Function that creates a connection pool
-async def create_db_pool():
-    # Create connection pool using credentials from .env file
-    return await asyncpg.create_pool(
-        user = getenv("DB_USER"),
-        password = getenv("DB_PASSWORD"),
-        database = getenv("DB_NAME"),
-        host = getenv("DB_HOST"),
-    )
+
+def get_supabase_client() -> Client:
+    url = os.getenv("SUPABASE_URL")
+    key = os.getenv("SUPABASE_SERVICE_ROLE_KEY")
+    return create_client(url, key)

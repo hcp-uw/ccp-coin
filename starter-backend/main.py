@@ -2,24 +2,17 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
 from ai_routes import router as ai_router
+from user_routes import router as user_router
+from stock_routes import router as stock_router
 from monitoring import MonitoringMiddleware
-from database import create_db_pool
 
 load_dotenv()
 
 app = FastAPI()
 app.add_middleware(MonitoringMiddleware)
 app.include_router(ai_router)
-
-
-@app.on_event("startup")
-async def startup():
-    app.db_pool = await create_db_pool()
-
-
-@app.on_event("shutdown")
-async def shutdown():
-    await app.db_pool.close()
+app.include_router(user_router)
+app.include_router(stock_router)
 
 app.add_middleware(
     CORSMiddleware,
