@@ -1,5 +1,7 @@
-from fastapi import APIRouter
+from datetime import date
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+from database import get_supabase_client
 
 router = APIRouter()
 
@@ -10,28 +12,64 @@ class PredictionResponse(BaseModel):
     confidence: float
 
 
-async def fetch_ai_prediction(stock: str) -> PredictionResponse:
-    """
-    Replace this with a real AI API call, e.g.:
-        response = await openai_client.chat.completions.create(...)
-    """
-    # TODO: replace with real AI call
-    return PredictionResponse(stock=stock, prediction="up", confidence=0.72)
-
-
-# Returns today's AI prediction for a given stock
 @router.get("/prediction/today")
 async def get_prediction(stock: str = "AAPL"):
-    return await fetch_ai_prediction(stock)
+    """
+    Returns today's AI prediction for a given stock from the ai_predictions table.
+    """
+    supabase = get_supabase_client()
+    stock = stock.strip().upper()
+
+    try:
+        today = date.today().isoformat()
+
+        result = (
+            supabase.table("ai_predictions")
+            .select("stock, prediction, confidence")
+            .eq("stock", stock)
+            .eq("date", today)
+            .limit(1)
+            .execute()
+        )
+
+        if not result.data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No prediction found for {stock} today"
+            )
+
+        row = result.data[0]
+        return PredictionResponse(
+            stock=row["stock"],
+            prediction=row["prediction"],
+            confidence=row["confidence"],
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch prediction: {str(e)}")
 
 
-# Returns the AI's past prediction history for a given stock
 @router.get("/prediction/history")
 async def get_prediction_history(stock: str = "AAPL", limit: int = 10):
-    # TODO: query Supabase ai_predictions table
-    mock_history = [
-        {"stock": stock, "prediction": "up", "confidence": 0.72, "actual": "up", "correct": True, "date": "2026-03-03"},
-        {"stock": stock, "prediction": "down", "confidence": 0.65, "actual": "up", "correct": False, "date": "2026-03-02"},
-        {"stock": stock, "prediction": "up", "confidence": 0.80, "actual": "up", "correct": True, "date": "2026-03-01"},
-    ]
-    return mock_history[:limit]
+    """
+    Returns past AI predictions for a given stock from the ai_predictions table.
+    """
+    supabase = get_supabase_client()
+    stock = stock.strip().upper()
+
+    try:
+        result = (
+            supabase.table("ai_predictions")
+            .select("stock, prediction, confidence, actual, correct, date")
+            .eq("stock", stock)
+            .order("date", desc=True)
+            .limit(limit)
+            .execute()
+        )
+
+        return result.data
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to fetch history: {str(e)}")
