@@ -6,6 +6,7 @@ import { BettingHistoryProvider } from "@/hooks/useBettingHistory";
 import { SlipProvider } from "@/hooks/useSlip";
 import { AppShell } from "@/components/landing/nav/AppShell";
 import "./globals.css";
+import { AuthProvider } from "@/hooks/useAuth";
 
 const arcadeFont = Press_Start_2P({
   weight: "400",
@@ -34,15 +35,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${arcadeFont.variable} ${monoFont.variable} font-mono bg-obsidian text-text crt-screen`}>
-        <AudioProvider>
-          <CurrencyProvider>
-            <BettingHistoryProvider>
-              <SlipProvider>
-                <AppShell>{children}</AppShell>
-              </SlipProvider>
-            </BettingHistoryProvider>
-          </CurrencyProvider>
-        </AudioProvider>
+        <AuthProvider>
+          <AudioProvider>
+            <CurrencyProvider>
+              <BettingHistoryProvider>
+                <SlipProvider>
+                  <AppShell>{children}</AppShell>
+                </SlipProvider>
+              </BettingHistoryProvider>
+            </CurrencyProvider>
+          </AudioProvider>
+        </AuthProvider>
       </body>
     </html>
   );

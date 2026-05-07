@@ -5,5 +5,5 @@ python-dotenv==1.1.0
 supabase
 httpx==0.28.1
 pytest==8.3.4
-yfinance
-PyJWT
+PyJWT==2.9.0
+yfinance==1.3.0

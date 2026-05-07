@@ -4,6 +4,8 @@ from dotenv import load_dotenv
 from ai_routes import router as ai_router
 from user_routes import router as user_router
 from stock_routes import router as stock_router
+from middleware.auth import AuthMiddleware
+from routes.auth_routes import router as auth_router
 from monitoring import MonitoringMiddleware
 
 load_dotenv()
@@ -13,6 +15,7 @@ app.add_middleware(MonitoringMiddleware)
 app.include_router(ai_router)
 app.include_router(user_router)
 app.include_router(stock_router)
+app.include_router(auth_router)
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,6 +24,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+app.add_middleware(AuthMiddleware)
 
 @app.get("/")
 def root():

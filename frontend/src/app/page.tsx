@@ -16,17 +16,27 @@ import { useEscapeKey } from "@/hooks/useEscapeKey";
 // 🔌 Layer 2: Supabase only
 import { supabase } from "@/lib/supabase";
 
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function Page() {
   const [activeModal, setActiveModal] = useState<
-    "signin" | "signup" | "how" | "faq" | "leaderboard" | null
+    "signin" | "signup" | "how" | "faq" | "leaderboard" | "forgotPassword" | null
   >(null);
+  const [authError, setAuthError] = useState<string | null>(null);
+  const [forgotEmail, setForgotEmail] = useState("");
+  const [forgotLoading, setForgotLoading] = useState(false);
+  const [forgotSent, setForgotSent] = useState(false);
 
   const { playSfx } = useAudio();
   const router = useRouter();
 
-  // ----------------------------
-  // 🔐 SIGN IN (Layer 2 only)
-  // ----------------------------
+  const clearAuthState = () => {
+    setAuthError(null);
+    setForgotSent(false);
+    setForgotEmail("");
+    setForgotLoading(false);
+  };
+
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -41,16 +51,13 @@ export default function Page() {
     });
 
     if (error) {
-      alert(error.message);
+      setAuthError(error.message);
       return;
     }
 
     router.push("/dashboard");
   };
 
-  // ----------------------------
-  // 🔐 SIGN UP (Layer 2 only)
-  // ----------------------------
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
@@ -65,19 +72,63 @@ export default function Page() {
     });
 
     if (error) {
-      alert(error.message);
+      setAuthError(error.message);
       return;
     }
 
     router.push("/dashboard");
   };
 
-  const openSignIn = () => setActiveModal("signin");
-  const openSignUp = () => setActiveModal("signup");
+  const handleForgotPassword = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const email = forgotEmail.trim().toLowerCase();
+
+    if (!email || !EMAIL_RE.test(email)) {
+      setAuthError("Please enter a valid email address.");
+      return;
+    }
+
+    setForgotLoading(true);
+    setAuthError(null);
+
+    const redirectTo = `${window.location.origin}/auth/reset-password`;
+    const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo });
+
+    setForgotLoading(false);
+
+    if (error) {
+      if (error.code === "over_email_send_rate_limit") {
+        setAuthError("Too many reset attempts. Please wait a few minutes before trying again.");
+      } else {
+        setAuthError(error.message);
+      }
+      return;
+    }
+
+    setForgotSent(true);
+  };
+
+  const openSignIn = () => {
+    clearAuthState();
+    setActiveModal("signin");
+  };
+
+  const openSignUp = () => {
+    clearAuthState();
+    setActiveModal("signup");
+  };
+
+  const openForgotPassword = () => {
+    setAuthError(null);
+    setForgotSent(false);
+    setActiveModal("forgotPassword");
+  };
 
   const closeModal = () => {
     playSfx("click");
     setActiveModal(null);
+    clearAuthState();
   };
 
   useEscapeKey(closeModal, activeModal !== null);
@@ -155,6 +206,9 @@ export default function Page() {
 
         {/* SIGN IN */}
         <RetroModal title="SIGN IN" isOpen={activeModal === "signin"}>
+          {authError && (
+            <p className="text-red-500 font-arcade text-[10px]">{authError}</p>
+          )}
           <form
             className="mx-auto w-full max-w-md space-y-6"
             onSubmit={handleSignIn}
@@ -185,11 +239,80 @@ export default function Page() {
             >
               LOGIN
             </button>
+            <button
+              type="button"
+              onClick={openForgotPassword}
+              className="block w-full text-center font-arcade text-[10px] text-primary underline hover:text-text transition-colors"
+            >
+              FORGOT PASSWORD?
+            </button>
           </form>
+        </RetroModal>
+
+        {/* FORGOT PASSWORD */}
+        <RetroModal title="RECOVER ACCOUNT" isOpen={activeModal === "forgotPassword"}>
+          {authError && (
+            <p className="text-red-500 font-arcade text-[10px] mb-4">{authError}</p>
+          )}
+          {forgotSent ? (
+            <div className="text-center space-y-4">
+              <p className="font-arcade text-[14px] text-xp">CHECK YOUR INBOX</p>
+              <p className="font-mono text-sm text-text">
+                If an account exists for <span className="text-primary">{forgotEmail}</span>,
+                a password reset link has been sent.
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  setForgotSent(false);
+                  setActiveModal("signin");
+                }}
+                className="border-[2px] border-primary bg-primary/10 px-4 py-2 font-arcade text-[10px] text-primary hover:bg-primary/20 transition-colors"
+              >
+                BACK TO SIGN IN
+              </button>
+            </div>
+          ) : (
+            <form
+              className="mx-auto w-full max-w-md space-y-6"
+              onSubmit={handleForgotPassword}
+            >
+              <label className="block font-arcade text-[10px] uppercase text-primary">
+                UW Email
+                <input
+                  type="email"
+                  value={forgotEmail}
+                  onChange={(e) => setForgotEmail(e.target.value)}
+                  className="mt-3 w-full border-[2px] border-primary bg-obsidian px-4 py-3 font-mono text-sm text-text"
+                  placeholder="name@uw.edu"
+                  autoFocus
+                />
+              </label>
+
+              <button
+                type="submit"
+                disabled={forgotLoading}
+                className="w-full border-[2px] border-xp bg-xp px-4 py-4 font-arcade text-sm text-obsidian disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {forgotLoading ? "SENDING..." : "SEND RESET LINK"}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setActiveModal("signin")}
+                className="block w-full text-center font-arcade text-[10px] text-muted hover:text-text transition-colors"
+              >
+                ← BACK TO SIGN IN
+              </button>
+            </form>
+          )}
         </RetroModal>
 
         {/* SIGN UP */}
         <RetroModal title="NEW CHALLENGER (SIGN UP)" isOpen={activeModal === "signup"}>
+          {authError && (
+            <p className="text-red-500 font-arcade text-[10px]">{authError}</p>
+          )}
           <form
             className="mx-auto w-full max-w-md space-y-6"
             onSubmit={handleSignUp}
