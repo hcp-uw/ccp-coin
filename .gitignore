@@ -1,13 +1,14 @@
 *__pycache__*
 *node_modules*
-.env
+.env*
 .next/
 frontend/.next/
 frontend/test-results/
 frontend/playwright-report/
 frontend/playwright/.cache/
 frontend/tsconfig.tsbuildinfo
+.playwright-mcp/
 thoughts/
 .agents/
 .claude/
-frontend/.env.local
+.omx/
