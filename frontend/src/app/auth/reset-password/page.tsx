@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useState, useEffect, FormEvent } from "react";
+import { Suspense, useState, useEffect, useRef, FormEvent } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { MotionConfig } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -34,6 +34,7 @@ function ResetPasswordForm() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [updating, setUpdating] = useState(false);
   const [updateError, setUpdateError] = useState<string | null>(null);
+  const redirectTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const passwordValid =
     password.length >= 8 && password === confirmPassword && confirmPassword.length > 0;
@@ -122,6 +123,14 @@ function ResetPasswordForm() {
     };
   }, [searchParams]);
 
+  useEffect(() => {
+    return () => {
+      if (redirectTimer.current) {
+        clearTimeout(redirectTimer.current);
+      }
+    };
+  }, []);
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setUpdateError(null);
@@ -146,7 +155,7 @@ function ResetPasswordForm() {
     }
 
     setView({ kind: "success" });
-    setTimeout(() => router.push("/dashboard"), 2500);
+    redirectTimer.current = setTimeout(() => router.push("/dashboard"), 2500);
   };
 
   return (

@@ -22,17 +22,10 @@ import {
   MOCK_HEAD_TO_HEAD,
 } from "@/content/mockData";
 import type { SlipDirection } from "@/types/slip";
-import { useEffect } from "react";
-import { apiGet } from "@/lib/api";
 
 
 export default function DashboardPage() {
   const [mobileView, setMobileView] = useState<"picks" | "watchlist" | "social">("picks");
-  useEffect(() => {
-    apiGet("/auth/me")
-      .then((data) => console.log(`Auth Check: ${data}`))
-      .catch((err) => console.error(`Auth Check Failed: ${err}`));
-  }, []);
 
   return (
       <DashboardContent mobileView={mobileView} onViewChange={setMobileView} />
